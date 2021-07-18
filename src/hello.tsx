@@ -11,13 +11,8 @@
 import React from 'react';
 import styles from './hello.css';
 
-
 const Hello: React.FC = () => {
-  return (
-    <div className={`omrs-main-content ${styles.container}`}>
-      
-    </div>
-  );
+  return <div className={`omrs-main-content ${styles.container}`}></div>;
 };
 
 export default Hello;
