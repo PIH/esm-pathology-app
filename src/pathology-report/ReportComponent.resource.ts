@@ -5,13 +5,6 @@ export interface EncounterResult {
   encounterDatetime: Date;
 }
 
-export async function getEncounter(encounterUUID) {
-  const searchEncounters = await openmrsFetch(`/ws/rest/v1/encounter/${encounterUUID}`);
-  // const data = await searchPatientEncounters.json();
-  // console.log("------------------" + data);
-  return searchEncounters;
-}
-
 export async function getPatientEncounters(patientUuid): Promise<Array<EncounterResult>> {
   const searchPatientEncounters = await openmrsFetch(`/ws/rest/v1/encounter?patient=${patientUuid}`);
   const fullPatientEncounterData = searchPatientEncounters.data.results

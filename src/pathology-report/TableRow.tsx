@@ -1,4 +1,5 @@
 import React from 'react';
+import { EncounterResult } from './ReportComponent.resource';
 
 export interface TableRowProps {
   encounterInfo: EncounterResult;

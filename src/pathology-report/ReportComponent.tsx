@@ -6,13 +6,9 @@ import { getPatientEncounters } from './ReportComponent.resource';
 const ReportComponent = () => {
   const [encountersList, setEncountersList] = React.useState([]);
   // const [selectedEncounter, setSelectedEncounter] = React.useState();
-  let selectedEncounter;
 
   React.useEffect(() => {
-    getPatientEncounters('').then((encs) => {
-      //   console.log(encs.data.results);
-      setEncountersList(encs);
-    });
+    getPatientEncounters('').then(setEncountersList);
   }, []);
 
   return (
