@@ -1,6 +1,11 @@
 import React from 'react';
+import { EncounterResult } from './ReportComponent.resource';
 
-const TableRow = (prop) => {
+export interface TableRowProps {
+  encounterInfo: EncounterResult;
+}
+
+export const TableRow = (props: TableRowProps) => {
   // console.log(prop.encounterInfo);
   return (
     <>
@@ -13,7 +18,7 @@ const TableRow = (prop) => {
       <td>Link</td>
       <td>{/* {prop.patient.phone_number} */}</td>
       <td>arrived at BDH</td>
-      <td>{prop.encounterInfo.encounterDatetime}</td>
+      <td>{props.encounterInfo.encounterDatetime}</td>
       <td>-</td>
       <td>
         <input type="checkbox" />
@@ -21,5 +26,3 @@ const TableRow = (prop) => {
     </>
   );
 };
-
-export default TableRow;

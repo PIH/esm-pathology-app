@@ -1,28 +1,15 @@
 import React from 'react';
 import styles from './ReportComponent.css';
-import TableRow from './TableRow';
-import getPatientEncounters from '../Pathology-getter/Pathology-patient-encounters-getter-resource';
-import getEncounters from '../Pathology-getter/Pathology-encounter-getter-resource';
+import { TableRow } from './TableRow';
+import { getPatientEncounters } from './ReportComponent.resource';
 
 const ReportComponent = () => {
   const [encountersList, setEncountersList] = React.useState([]);
   // const [selectedEncounter, setSelectedEncounter] = React.useState();
-  let selectedEncounter;
 
   React.useEffect(() => {
-    getPatientEncounters('').then((encs) => {
-      //   console.log(encs.data.results);
-      setEncountersList(encs.data.results);
-    });
+    getPatientEncounters('').then(setEncountersList);
   }, []);
-
-  const encounterInfo = (encUUID) => {
-    // console.log(encUUID);
-    getEncounters(encUUID).then((enc) => {
-      //   console.log(enc.data.encounterDatetime);
-      return enc.data;
-    });
-  };
 
   return (
     <table className={styles.table}>
@@ -39,11 +26,11 @@ const ReportComponent = () => {
         </tr>
       </thead>
       <tbody>
-        {encountersList.map((request) => (
+        {encountersList.map((enc) => (
           // foo.results.find(item => item.id === 2)
 
-          <tr className={styles.tr} key={request.uuid}>
-            <TableRow request={request} encounterInfo={encounterInfo(request.uuid)} />
+          <tr className={styles.tr} key={enc.uuid}>
+            <TableRow encounterInfo={enc} />
           </tr>
         ))}
       </tbody>
