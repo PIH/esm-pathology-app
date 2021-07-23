@@ -6,20 +6,19 @@ export interface TableRowProps {
 }
 
 export const TableRow = (props: TableRowProps) => {
-  // console.log(prop.encounterInfo);
   return (
     <>
       <td>Link</td>
       <td>
-        {/* {prop.patient.family_name} {' '}
-                {prop.patient.middle_name} {' '}
-                {prop.patient.first_name} {' '} */}
+        {props.encounterInfo.patientName.familyName && props.encounterInfo.patientName.familyName}{' '}
+        {props.encounterInfo.patientName.familyName2 && props.encounterInfo.patientName.familyName2}{' '}
+        {props.encounterInfo.patientName.givenName && props.encounterInfo.patientName.givenName}{' '}
       </td>
       <td>Link</td>
-      <td>{/* {prop.patient.phone_number} */}</td>
-      <td>arrived at BDH</td>
+      <td>{props.encounterInfo.patientPhoneNumber && props.encounterInfo.patientPhoneNumber.value}</td>
+      <td>{props.encounterInfo.sampleStatusObs ? props.encounterInfo.sampleStatusObs.value.display : '--'} </td>
       <td>{props.encounterInfo.encounterDatetime}</td>
-      <td>-</td>
+      <td>{props.encounterInfo.referralStatusObs ? props.encounterInfo.referralStatusObs.value.display : '--'}</td>
       <td>
         <input type="checkbox" />
       </td>
