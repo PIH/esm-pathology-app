@@ -1,12 +1,13 @@
-export const ENCOUNTERTYPEUUID = '4d911f5c-26fe-102b-80cb-0017a47871b2';
-export const FORMNAME = 'CURRENT PROGRAMME ADULTE VIH - RENDEZ-VOUS - Rwanda 2.1';
-export const SAMPLESTATUSUUID = '3ce163d8-26fe-102b-80cb-0017a47871b2';
-export const REFERRALSTATUSUUID = '3cd93302-26fe-102b-80cb-0017a47871b2';
-export const SAMPLEDROPOFFUUID = '13662f27-9be5-4595-8bab-07b0e859d9f4';
-export const PHONENUMBERATTRUUID = 'd6bcc287-4576-4264-961b-6bf1c08fbf68';
-export const HEALTHCENTERATTRTYPEUUID = '8d87236c-c2cc-11de-8d13-0010c6dffd0f';
-export const RWINKWAVUHOSPITALUUID = '38c4b94b-97a6-4f2c-bca6-c28a37cf60ed';
-export const RWINKWAVUHOSPITALNAME = 'Rwinkwavu Hospital';
-export const RWINKWAVUHEALTHCENTERNAME = 'Rwinkwavu Health Center';
-export const YESCONCEPTUUID = '3cd6f600-26fe-102b-80cb-0017a47871b2';
-export const YESCONCEPTNAME = 'YES';
+export const ENCOUNTERTYPEUUID = "4d911f5c-26fe-102b-80cb-0017a47871b2";
+export const FORMNAME =
+  "CURRENT PROGRAMME ADULTE VIH - RENDEZ-VOUS - Rwanda 2.1";
+export const SAMPLESTATUSUUID = "3ce163d8-26fe-102b-80cb-0017a47871b2";
+export const REFERRALSTATUSUUID = "3cd93302-26fe-102b-80cb-0017a47871b2";
+export const SAMPLEDROPOFFUUID = "13662f27-9be5-4595-8bab-07b0e859d9f4";
+export const PHONENUMBERATTRUUID = "d6bcc287-4576-4264-961b-6bf1c08fbf68";
+export const HEALTHCENTERATTRTYPEUUID = "8d87236c-c2cc-11de-8d13-0010c6dffd0f";
+export const RWINKWAVUHOSPITALUUID = "38c4b94b-97a6-4f2c-bca6-c28a37cf60ed";
+export const RWINKWAVUHOSPITALNAME = "Rwinkwavu Hospital";
+export const RWINKWAVUHEALTHCENTERNAME = "Rwinkwavu Health Center";
+export const YESCONCEPTUUID = "3cd6f600-26fe-102b-80cb-0017a47871b2";
+export const YESCONCEPTNAME = "YES";
