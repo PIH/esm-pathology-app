@@ -1,7 +1,7 @@
-/* .table {
+.table {
     width: 100%;
     position: relative;
-  } */
+  }
   .tableContainer {
     height: 500px;
     overflow-x: auto;
