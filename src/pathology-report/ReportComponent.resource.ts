@@ -1,75 +1,246 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
+import {ENCOUNTERTYPEUUID,PHONENUMBERATTRUUID,HEALTHCENTERATTRTYPEUUID,SAMPLESTATUSUUID,REFERRALSTATUSUUID,SAMPLEDROPOFFUUID,RWINKWAVUHOSPITALUUID,YESCONCEPTUUID} 
+from '../constants.js'
 
-const encounterTypeUuid = '4d911f5c-26fe-102b-80cb-0017a47871b2';
-const formName = 'CURRENT PROGRAMME ADULTE VIH - RENDEZ-VOUS - Rwanda 2.1';
-const sampleStatusUuid = '3ce163d8-26fe-102b-80cb-0017a47871b2';
-const referralStatusUuuid = '3cd93302-26fe-102b-80cb-0017a47871b2';
-const sampleDropOffUuid = '13662f27-9be5-4595-8bab-07b0e859d9f4';
-const phoneNumberAttrUuid = 'd6bcc287-4576-4264-961b-6bf1c08fbf68';
-const healthCenterAttrTypeUuid = '8d87236c-c2cc-11de-8d13-0010c6dffd0f';
-const rwinkwavuHospitalUuid = '38c4b94b-97a6-4f2c-bca6-c28a37cf60ed';
-const rwinkwavuHospitalName = 'Rwinkwavu Hospital';
-const rwinkwavuHealthcenterName = 'Rwinkwavu Health Center';
 
 export interface EncounterResult {
-  patientName: { familyName: string; familyName2: string; givenName: string };
+  family_name: string;
+  given_name: string;
+  middle__name:string;
   patientPhoneNumber: { value: string };
+  patientHealthCenter: string;
   patientUuid: string;
   uuid: string;
+  encounterId: number;
+  personId: number;
   encounterDatetime: Date;
   sampleStatusObs: { value: { display: string } };
   referralStatusObs: { value: { display: string } };
   sampleDropoffObs: { value: { display: string } };
 }
-export interface iPatient {
+export interface Patient {
   uuid: string;
 }
-export interface iConcept {
+export interface Concept {
   uuid: string;
   name: string;
 }
-
-export async function getPatientEncounters(patientUuid): Promise<Array<EncounterResult>> {
-  const searchPatientEncounters = await openmrsFetch(
-    `/ws/rest/v1/encounter?encounterType=${encounterTypeUuid}&patient=${patientUuid}`,
-  );
-  const fullPatientEncounterData = searchPatientEncounters.data.results.map(async (searchEnc) => {
-    const enc = await openmrsFetch(`/ws/rest/v1/encounter/${searchEnc.uuid}?v=full`);
-    const searchPatient = await openmrsFetch(`/ws/rest/v1/patient/${patientUuid}?v=full`);
-
-    const retrievedObject = {
-      patientName: searchPatient.data.person.names[0],
-      patientPhoneNumber: searchPatient.data.person.attributes.filter(
-        (attribute) => attribute.attributeType.uuid == phoneNumberAttrUuid,
-      )[0],
-      patientHealthCenter: searchPatient.data.person.attributes.filter(
-        (attribute) => attribute.attributeType.uuid == healthCenterAttrTypeUuid,
-      )[0],
-      patientUuid: searchPatient.data.uuid,
-      encUuid: enc.data.uuid,
-      encounterDatetime: enc.data.encounterDatetime,
-      sampleStatusObs: enc.data.obs.filter((obs) => obs.concept.uuid === sampleStatusUuid)[0],
-      referralStatusObs: enc.data.obs.filter((obs) => obs.concept.uuid === referralStatusUuuid)[0],
-      sampleDropoffObs: enc.data.obs.filter((obs) => obs.concept.uuid === sampleDropOffUuid)[0],
-    };
-
-    return retrievedObject;
-  });
-  return Promise.all(fullPatientEncounterData);
+export interface Obs {
+  patientUuid: string;
+  obsDateTime: string;
+  sampleDropoffObsUuid: string;
+  referralStatusObsUuid: string;
+  sampleStatusObsUuid: string;
+  location: string;
+  encounterUuid: string;
+  valueCodedName: string;
+  voided: boolean; 
 }
 
-export async function getConcept(conceptUuid) {
+// export async function getPatientEncounters(patientUuid): Promise<Array<EncounterResult>> {
+//   const searchPatientEncounters = await openmrsFetch(
+//     `/ws/rest/v1/encounter?encounterType=${ENCOUNTERTYPEUUID}&patient=${patientUuid}`,
+//   );
+//   const fullPatientEncounterData = searchPatientEncounters.data.results.map(async (searchEnc) => {
+//     const enc = await openmrsFetch(`/ws/rest/v1/encounter/${searchEnc.uuid}?v=full`);
+//     const searchPatient = await openmrsFetch(`/ws/rest/v1/patient/${patientUuid}?v=full`);
+//     const retrievedObject = {
+//       patientName: searchPatient.data.person.names[0],
+//       patientPhoneNumber: searchPatient.data.person.attributes.filter(
+//         (attribute) => attribute.attributeType.uuid == PHONENUMBERATTRUUID,
+//       )[0],
+//       patientHealthCenter: searchPatient.data.person.attributes.filter(
+//         (attribute) => attribute.attributeType.uuid == HEALTHCENTERATTRTYPEUUID,
+//       )[0],
+//       patientUuid: searchPatient.data.uuid,
+//       encUuid: enc.data.uuid,
+//       encounterDatetime: enc.data.encounterDatetime,
+//       sampleStatusObs: enc.data.obs.filter((obs) => obs.concept.uuid === SAMPLESTATUSUUID)[0],
+//       referralStatusObs: enc.data.obs.filter((obs) => obs.concept.uuid === REFERRALSTATUSUUID)[0],
+//       sampleDropoffObs: enc.data.obs.filter((obs) => obs.concept.uuid === SAMPLEDROPOFFUUID)[0],
+//     };
+
+//     return retrievedObject;
+//   });
+//   return Promise.all(fullPatientEncounterData);
+// }
+
+export async function getUserLocation(){
+  const session = await openmrsFetch(`/ws/rest/v1/session`);
+  const personUuid=session.data.user.person.uuid;
+  const person = await openmrsFetch(`/ws/rest/v1/person/${personUuid}/attribute`);
+  const hcPersonAttribute = person.data.results.filter((attr) => attr.attributeType.uuid === HEALTHCENTERATTRTYPEUUID); 
+  return hcPersonAttribute[0] ? hcPersonAttribute[0].value.uuid : null;
+}
+
+export async function getConceptAnswers(conceptUuid) {
   const concept = await openmrsFetch(`/ws/rest/v1/concept/${conceptUuid}?v=full`);
   return concept.data.answers;
 }
 
-export async function getLocation(locationName) {
-  const location = await openmrsFetch(`/ws/rest/v1/location?q=${locationName}&v=default`);
+export async function getLocations() {
+ 
+  const location = await openmrsFetch(`/ws/rest/v1/location`);
 
   return location.data.results;
 }
 
-export async function getPatient(patientUuid): Promise<iPatient> {
-  const searchPatient = await openmrsFetch(`/ws/rest/v1/patient/c604dabc-2700-102b-80cb-0017a47871b2?v=full`);
-  return searchPatient.data;
+// export async function getPatient(patientUuid): Promise<Patient> {
+//   const searchPatient = await openmrsFetch(`/ws/rest/v1/patient/c604dabc-2700-102b-80cb-0017a47871b2?v=full`);
+//   return searchPatient.data;
+// }
+
+export async function getEncounters(): Promise<Array<EncounterResult>>{
+  const userLocationUUID = await getUserLocation();
+  
+  let searchEncounter=null;
+  if(userLocationUUID){
+     searchEncounter = await openmrsFetch(`/ws/rest/v1/reportingrest/reportdata/996cf192-ff54-11eb-a63a-080027ce9ca0?location=${userLocationUUID}`);
+  }
+  else{
+     searchEncounter = await openmrsFetch(`/ws/rest/v1/reportingrest/reportdata/996cf192-ff54-11eb-a63a-080027ce9ca0`);
+
+  }
+  return searchEncounter.data.dataSets[0] ? searchEncounter.data.dataSets[0].rows: null;
+}
+
+export async function postSampleDropoffObs(obsObject: Obs){
+  const ObsObjectTocreate = 
+  {
+    'person': obsObject.patientUuid,
+    'obsDatetime': (new Date()).toISOString(),
+    'concept': SAMPLEDROPOFFUUID,
+    'location': await getUserLocation(),
+    'encounter': obsObject.encounterUuid,
+    'value': YESCONCEPTUUID,
+    'voided': false
+  }
+  
+  const response = await openmrsFetch('/ws/rest/v1/obs',{
+  method: 'POST',
+  headers:{ 
+    'content-type': 'application/json'
+    },
+  body: ObsObjectTocreate
+  
+  })
+  return response;
+}
+
+export async function voidSampleDropoff(obsObject: Obs){
+  const ObsObjectTocreate = 
+  {
+    'voided': true
+  }
+  
+  const response = await openmrsFetch(`/ws/rest/v1/obs/${obsObject.sampleDropoffObsUuid}`,{
+  method: 'POST',
+  headers:{ 
+    'content-type': 'application/json'
+    },
+  body: ObsObjectTocreate
+  
+  })
+
+  return response;
+}
+
+export async function postSampleStatusChangeObs(targetValue,obsObject: Obs){
+  const ObsObjectTocreate = 
+  {
+    'person': obsObject.patientUuid,
+    'obsDatetime': (new Date()).toISOString(),
+    'concept': SAMPLESTATUSUUID,
+    'location': await getUserLocation(),
+    'encounter': obsObject.encounterUuid,
+    'value': targetValue.uuid,
+    'voided': false
+  }
+  
+  const response = await openmrsFetch('/ws/rest/v1/obs',{
+  method: 'POST',
+  headers:{ 
+    'content-type': 'application/json'
+    },
+  body: ObsObjectTocreate
+  
+  })
+
+  return response;
+}
+
+
+
+export async function updateSampleStatusChangeObs(targetValue,obsObject: Obs){
+  const ObsObjectTocreate = 
+  {
+    'person': obsObject.patientUuid,
+    'obsDatetime': (new Date()).toISOString(),
+    'concept': SAMPLESTATUSUUID,
+    'location': await getUserLocation(),
+    'encounter': obsObject.encounterUuid,
+    'value': targetValue.uuid,
+    'voided': targetValue ? false: true
+  }
+  
+  const response = await openmrsFetch(`/ws/rest/v1/obs/${obsObject.sampleStatusObsUuid}`,{
+  method: 'POST',
+  headers:{ 
+    'content-type': 'application/json'
+    },
+  body: ObsObjectTocreate
+  
+  })
+
+  return response;
+}
+
+export async function postReferralStatusChangeObs(targetValue,obsObject: Obs){
+  const ObsObjectTocreate = 
+  {
+    'person': obsObject.patientUuid,
+    'obsDatetime': (new Date()).toISOString(),
+    'concept': REFERRALSTATUSUUID,
+    'location': await getUserLocation(),
+    'encounter': obsObject.encounterUuid,
+    'value': targetValue.uuid,
+    'voided': false
+  }
+  
+  const response = await openmrsFetch('/ws/rest/v1/obs',{
+  method: 'POST',
+  headers:{ 
+    'content-type': 'application/json'
+    },
+  body: ObsObjectTocreate
+  
+  })
+
+  return response;
+}
+
+
+
+export async function updateReferralStatusChangeObs(targetValue,obsObject: Obs){
+  const ObsObjectTocreate = 
+  {
+    'person': obsObject.patientUuid,
+    'obsDatetime': (new Date()).toISOString(),
+    'concept': REFERRALSTATUSUUID,
+    'location': await getUserLocation(),
+    'encounter': obsObject.encounterUuid,
+    'value': targetValue.uuid,
+    'voided': targetValue ? false: true
+  }
+  
+  const response = await openmrsFetch(`/ws/rest/v1/obs/${obsObject.referralStatusObsUuid}`,{
+  method: 'POST',
+  headers:{ 
+    'content-type': 'application/json'
+    },
+  body: ObsObjectTocreate
+  
+  })
+
+  return response;
 }
