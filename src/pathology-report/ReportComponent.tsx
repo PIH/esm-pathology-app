@@ -1,54 +1,28 @@
-import React from "react";
+import React from 'react';
+import { useConfig } from "@openmrs/esm-framework";
 import cloneDeep from "lodash-es/cloneDeep";
-import {
-  DataTable,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-} from "carbon-components-react";
+import DataTable, {Table,TableHead,TableRow,TableHeader,TableBody,TableCell} from 'carbon-components-react/es/components/DataTable';
 
 import styles from "./ReportComponent.css";
 // import { TableRow } from './TableRow';
-import {
-  getUserLocation,
-  getConceptAnswers,
-  getLocations,
-  getEncounters,
-  postSampleDropoffObs,
-  voidSampleDropoff,
-  postSampleStatusChangeObs,
-  updateSampleStatusChangeObs,
-  postReferralStatusChangeObs,
-  updateReferralStatusChangeObs,
-} from "./ReportComponent.resource";
-import {
-  RWINKWAVUHEALTHCENTERNAME,
-  SAMPLESTATUSUUID,
-  REFERRALSTATUSUUID,
-  SAMPLEDROPOFFUUID,
-  YESCONCEPTNAME,
-} from "../constants.js";
+import {  getUserLocation, getConceptAnswers, getLocations,getEncounters,postSampleDropoffObs,
+  voidSampleDropoff,postSampleStatusChangeObs,updateSampleStatusChangeObs,postReferralStatusChangeObs,
+  updateReferralStatusChangeObs } from './ReportComponent.resource';
+
+
 
 const ReportComponent = () => {
-  const [userLocation, setUserLocation] = React.useState();
+  const config = useConfig();
+  const [userLocation,setUserLocation] = React.useState();
   const [encountersList, setEncountersList] = React.useState([]);
-  const tempEncList = React.useRef([]);
   const [sendingHospital, setSendingHospital] = React.useState("");
   const [listOfHospitals, setListOfHospitals] = React.useState([]);
   const [sampleStatusResults, setSampleStatusResults] = React.useState([]);
   const [referralStatusResults, setReferralStatusResults] = React.useState([]);
   const [sampleStatus, setSampleStatus] = React.useState("");
   const [referralStatus, setReferralStatus] = React.useState("");
-  const [patientName, setpatientName] = React.useState("");
-  // var rows =[];
+  const [patientName, setPatientName] = React.useState("");
   const headers = [
-    // {
-    //   key: 'patientLink',
-    //   header: 'Link to patient',
-    // },
     {
       key: "patientNames",
       header: "Patient name",
@@ -58,8 +32,8 @@ const ReportComponent = () => {
       header: "pathology request",
     },
     {
-      key: "SendingHospital",
-      header: "Sending Hospital",
+      key: 'sendingHospital',
+      header: 'Sending Hospital',
     },
     {
       key: "phoneNumber",
@@ -81,28 +55,21 @@ const ReportComponent = () => {
       key: "sampleDropOff",
       header: "Sample drop off?",
     },
+    {
+      key: 'resultsEncounter',
+      header: 'Results',
+    },
+    
   ];
 
   React.useEffect(() => {
-    getUserLocation().then(setUserLocation);
+    getUserLocation(config.healthCenterAttrTypeUUID).then(setUserLocation);
     getLocations().then(setListOfHospitals);
-    getConceptAnswers(SAMPLESTATUSUUID).then(setSampleStatusResults);
-    getConceptAnswers(REFERRALSTATUSUUID).then(setReferralStatusResults);
-    getEncounters().then(setEncountersList);
+    getConceptAnswers(config.sampleStatusConceptUUID).then(setSampleStatusResults);
+    getConceptAnswers(config.referralStatusConceptUUID).then(setReferralStatusResults);
+    getEncounters(config.healthCenterAttrTypeUUID,config.pathologyFullAllowedLocationName).then(setEncountersList);
   }, []);
 
-  const handleSampleStatus = (value) => {
-    setSampleStatus(value);
-  };
-  const handleReferralStatus = (value) => {
-    setReferralStatus(value);
-  };
-  const handleSendingHospital = (value) => {
-    setSendingHospital(value);
-  };
-  const handlePatientName = (value) => {
-    setpatientName(value);
-  };
 
   const filteredEncList = encountersList
     .filter(
@@ -127,139 +94,100 @@ const ReportComponent = () => {
     )
     .filter(
       (encList) =>
-        !patientName ||
-        (encList.family_name &&
-          encList.family_name
-            .toLowerCase()
-            .includes(patientName.toLowerCase())) ||
-        (encList.family_name2 &&
-          encList.family_name2
-            .toLowerCase()
-            .includes(patientName.toLowerCase())) ||
-        (encList.middle_name &&
-          encList.middle_name
-            .toLowerCase()
-            .includes(patientName.toLowerCase())) ||
-        (encList.given_name &&
-          encList.given_name.toLowerCase().includes(patientName.toLowerCase()))
-    );
-  // const rows = filteredEncList.map(
-  //   (encounterInfo) => {
-  //       return {
-  //           // patientLink: <a href={`/openmrs/patientDashboard.form?patientId=${encounterInfo.personId}`} >Link</a>,
-  //           ...
+      // !patientName || (encList.family_name && encList.family_name.toLowerCase().includes(patientName.toLowerCase())) || 
+      //   (encList.family_name2 && encList.family_name2.toLowerCase().includes(patientName.toLowerCase())) ||
+      //   (encList.middle_name && encList.middle_name.toLowerCase().includes(patientName.toLowerCase())) ||
+      //   (encList.given_name && encList.given_name.toLowerCase().includes(patientName.toLowerCase())),
+      !patientName || ((encList.family_name+encList.middle_name+encList.given_name) && (encList.family_name+encList.middle_name+encList.given_name).toLowerCase().includes(patientName.replace(/\s+/g, '').toLowerCase())) || 
+      ((encList.family_name+encList.given_name+encList.middle_name) && (encList.family_name+encList.given_name+encList.middle_name).toLowerCase().includes(patientName.replace(/\s+/g, '').toLowerCase())) ||
+      ((encList.middle_name+encList.family_name+encList.given_name) && (encList.middle_name+encList.family_name+encList.given_name).toLowerCase().includes(patientName.replace(/\s+/g, '').toLowerCase())) ||
+      ((encList.middle_name+encList.given_name+encList.family_name) && (encList.middle_name+encList.given_name+encList.family_name).toLowerCase().includes(patientName.replace(/\s+/g, '').toLowerCase())) ||
+      ((encList.given_name+encList.family_name+encList.middle_name) && (encList.given_name+encList.family_name+encList.middle_name).toLowerCase().includes(patientName.replace(/\s+/g, '').toLowerCase())) ||
+      ((encList.given_name+encList.middle_name+encList.family_name) && (encList.given_name+encList.middle_name+encList.family_name).toLowerCase().includes(patientName.replace(/\s+/g, '').toLowerCase())),
+
+
+
+
+        // (encList.given_name && (encList.given_name+encList.family_name+encList.given_name).toLowerCase().includes(patientName.toLowerCase())),
+    )
+    ;
+    //replace(/\s+/g, ''); 
+    // const rows = filteredEncList.map(
+    //   (encounterInfo) => {
+    //       return {
+    //           // patientLink: <a href={`/openmrs/patientDashboard.form?patientId=${encounterInfo.personId}`} >Link</a>,
+    //           ...
+  
+
+    const rows = filteredEncList.map( 
+      (encounterInfo) => {
+          return {
 
   var rows = filteredEncList.map((encounterInfo) => {
     return {
       // rows.push({
-      // patientLink: <a href={`/openmrs/patientDashboard.form?patientId=${encounterInfo.personId}`} >Link</a>,
-      id: `${encounterInfo.encounterId}`,
-      patientNames: (
-        <a
-          href={`/openmrs/patientDashboard.form?patientId=${encounterInfo.personId}`}
-        >
-          {encounterInfo.family_name ? encounterInfo.family_name : ""}{" "}
-          {encounterInfo.given_name ? encounterInfo.given_name : ""}{" "}
-          {encounterInfo.middle_name ? encounterInfo.middle_name : ""}{" "}
-        </a>
-      ),
-      pathologyRequest: (
-        <a
-          href={`/openmrs/module/htmlformentry/htmlFormEntry.form?encounterId=${encounterInfo.encounterId}&mode=EDIT`}
-        >
-          {" "}
-          Link{" "}
-        </a>
-      ),
-      SendingHospital: `${encounterInfo.patientHealthCenter}`,
-      phoneNumber: `${
-        encounterInfo.patientPhoneNumber ? encounterInfo.patientPhoneNumber : ""
-      }`,
-      sampleStatus: (
-        <select
-          onChange={(e) =>
-            sampleStatusChange(
-              e.target.value && JSON.parse(e.target.value),
-              encounterInfo
-            )
-          }
-        >
-          <option value=""></option>
-          {sampleStatusResults.map((ans) => (
-            <option
-              value={`{"uuid": "${ans.uuid}","display": "${ans.display}"}`}
-              key={ans.uuid}
-              selected={
-                encounterInfo.sampleStatusObs
-                  ? encounterInfo.sampleStatusObs === ans.display && true
-                  : false
-              }
-            >
-              {ans.display}
-            </option>
-          ))}
-        </select>
-      ),
-      dateOfRequest: `${encounterInfo.encounterDatetime}`,
-      referralStatus: (
-        <select
-          onChange={(e) =>
-            referralStatusChange(
-              e.target.value && JSON.parse(e.target.value),
-              encounterInfo
-            )
-          }
-        >
-          <option value=""></option>
-          {referralStatusResults.map((ans) => (
-            <option
-              value={`{"uuid": "${ans.uuid}","display": "${ans.display}"}`}
-              key={ans.uuid}
-              selected={
-                encounterInfo.referralStatusObs
-                  ? encounterInfo.referralStatusObs === ans.display && true
-                  : false
-              }
-            >
-              {ans.display}
-            </option>
-          ))}
-        </select>
-      ),
-      sampleDropOff: (
-        <input
-          type="checkbox"
-          checked={encounterInfo.sampleDropoffObs ? true : false}
-          onChange={(e) => sampleDropOffChange(encounterInfo)}
-        />
-      ),
+        // patientLink: <a href={`/openmrs/patientDashboard.form?patientId=${encounterInfo.personId}`} >Link</a>,
+        id: encounterInfo.encounterId,
+        patientNames: <a href={`/openmrs/patientDashboard.form?patientId=${encounterInfo.personId}`}> 
+                      {encounterInfo.family_name}{"  "}
+                      {encounterInfo.given_name}{"  "}
+                      {encounterInfo.middle_name}
+                      </a>,
+        pathologyRequest: <a href={`/openmrs/module/htmlformentry/htmlFormEntry.form?encounterId=${encounterInfo.encounterId}&mode=VIEW`}> Link </a>,
+        sendingHospital: encounterInfo.patientHealthCenter,
+        phoneNumber: `${encounterInfo.patientPhoneNumber ? encounterInfo.patientPhoneNumber:''}`,
+        sampleStatus: <select onChange={(e) => sampleStatusChange(e.target.value && JSON.parse(e.target.value),encounterInfo)}>
+                        <option value="" ></option>
+                        {sampleStatusResults.map((ans) => (
+                          <option value={`{"uuid": "${ans.uuid}","display": "${ans.display}"}`} key={ans.uuid} selected=
+                            {encounterInfo.sampleStatusObs ?  (encounterInfo.sampleStatusObs===ans.display && true ): false}>
+                            {ans.display} 
+                          </option>
+                        ))}
+                      </select>,
+        dateOfRequest: encounterInfo.encounterDatetime,
+        referralStatus: <select onChange={(e) => referralStatusChange(e.target.value && JSON.parse(e.target.value),encounterInfo)}>
+                              <option value="" ></option>
+                              {referralStatusResults.map((ans) => (
+                                <option value={`{"uuid": "${ans.uuid}","display": "${ans.display}"}`} key={ans.uuid} selected=
+                                  {encounterInfo.referralStatusObs && encounterInfo.referralStatusObs===ans.display }>
+                                  {ans.display} 
+                                </option>
+                              ))}
+                          </select>,
+        sampleDropOff: <input type="checkbox" checked={Boolean(encounterInfo.sampleDropoffObs)}
+                          onChange={(e) => sampleDropOffChange(encounterInfo)}/>,
+        resultsEncounter: encounterInfo.resultsEncounterId 
+                            ? <a href={`/openmrs/module/htmlformentry/htmlFormEntry.form?encounterId=${encounterInfo.resultsEncounterId}&mode=VIEW`}> Results </a>
+                            : !userLocation && <a href={`/openmrs/module/htmlformentry/htmlFormEntry.form?personId=${encounterInfo.personId}&patientId=${encounterInfo.personId}&returnUrl=&formId=${config.pathologyResultsFromID}&uuid=${encounterInfo.encounterUuid}`}> Fill in results </a>
+                            
+      }}
+    )
 
-      // })
-    };
-  });
+    const sampleDropOffChange = (encounterInfo) =>{
+      const tempEncList = cloneDeep( encountersList); 
+      if(!encounterInfo.sampleDropoffObs){
+        postSampleDropoffObs(encounterInfo,config.sampleDropOffconceptUUID,config.healthCenterAttrTypeUUID,config.yesConceptUUID).then( (response) =>{
+          if(response.ok){     
+            const encIndex =  tempEncList.findIndex((enc => enc.encounterUuid==encounterInfo.encounterUuid));
+            tempEncList[encIndex].sampleDropoffObs = config.yesConceptName;
+            tempEncList[encIndex].sampleDropoffObsUuid = response.data.uuid;
+            setEncountersList(tempEncList);
+          }
+        })
+      }
+      else {
+        voidSampleDropoff(encounterInfo.sampleDropoffObsUuid).then((response) => {
+          if(response.ok){   
+            const encIndex = tempEncList.findIndex((enc => enc.encounterUuid==encounterInfo.encounterUuid));
+            tempEncList[ encIndex].sampleDropoffObs = "";
+            tempEncList[ encIndex].sampleDropoffObsUuid = "";
 
-  const sampleDropOffChange = (encounterInfo) => {
-    tempEncList.current = cloneDeep(encountersList);
-    if (!encounterInfo.sampleDropoffObs) {
-      postSampleDropoffObs(encounterInfo).then((Response) => {
-        if (Response.ok) {
-          const encIndex = tempEncList.current.findIndex(
-            (enc) => enc.encounterUuid == encounterInfo.encounterUuid
-          );
-          tempEncList.current[encIndex].sampleDropoffObs = YESCONCEPTNAME;
-          tempEncList.current[encIndex].sampleDropoffObsUuid =
-            Response.data.uuid;
-          setEncountersList(tempEncList.current);
-        }
-      });
-    } else if (encounterInfo.sampleDropoffObs) {
-      voidSampleDropoff(encounterInfo).then((response) => {
-        if (response.ok) {
-          const encIndex = tempEncList.current.findIndex(
-            (enc) => enc.encounterUuid == encounterInfo.encounterUuid
-          );
-          tempEncList.current[encIndex].sampleDropoffObs = "";
-          tempEncList.current[encIndex].sampleDropoffObsUuid = "";
+            setEncountersList(tempEncList);
+          }
+        })
+      }
+      
 
           setEncountersList(tempEncList.current);
         }
@@ -267,43 +195,33 @@ const ReportComponent = () => {
     }
   };
 
-  const sampleStatusChange = (targetedElem, encounterInfo) => {
-    tempEncList.current = cloneDeep(encountersList);
-    if (!encounterInfo.sampleStatusObs) {
-      postSampleStatusChangeObs(targetedElem, encounterInfo).then(
-        (response) => {
-          if (response.ok) {
-            const encIndex = tempEncList.current.findIndex(
-              (enc) => enc.encounterUuid == encounterInfo.encounterUuid
-            );
-            tempEncList.current[encIndex].sampleStatusObs =
-              targetedElem.display;
-            tempEncList.current[encIndex].sampleStatusObsUuid =
-              response.data.uuid;
+    const sampleStatusChange = (targetedElem,encounterInfo) =>{
+      const tempEncList = cloneDeep( encountersList); 
+      if(!encounterInfo.sampleStatusObs){
+        postSampleStatusChangeObs(targetedElem.uuid,encounterInfo,config.sampleStatusConceptUUID,config.healthCenterAttrTypeUUID).then((response) => {
+          if(response.ok){  
+            const encIndex = tempEncList.findIndex((enc => enc.encounterUuid==encounterInfo.encounterUuid));   
+            tempEncList[encIndex].sampleStatusObs = targetedElem.display;
+            tempEncList[encIndex].sampleStatusObsUuid = response.data.uuid;
 
-            setEncountersList(tempEncList.current);
-          } else {
-            setEncountersList(tempEncList.current);
+            setEncountersList(tempEncList);
+          }
+          else{
+            setEncountersList(tempEncList);
             //Need error message
           }
-        }
-      );
-    } else if (encounterInfo.sampleStatusObs) {
-      updateSampleStatusChangeObs(targetedElem, encounterInfo).then(
-        (response) => {
-          if (response.ok) {
-            const encIndex = tempEncList.current.findIndex(
-              (enc) => enc.encounterUuid == encounterInfo.encounterUuid
-            );
-            tempEncList.current[encIndex].sampleStatusObs = targetedElem
-              ? targetedElem.display
-              : "";
-            tempEncList.current[encIndex].sampleStatusObsUuid = targetedElem
-              ? response.data.uuid
-              : "";
-            setEncountersList(tempEncList.current);
-          } else {
-            setEncountersList(tempEncList.current);
+        })
+      }
+      else {
+        updateSampleStatusChangeObs(targetedElem,encounterInfo,config.sampleStatusConceptUUID,config.healthCenterAttrTypeUUID).then((response) => {
+          if(response.ok){ 
+            const encIndex = tempEncList.findIndex((enc => enc.encounterUuid==encounterInfo.encounterUuid));  
+            tempEncList[encIndex].sampleStatusObs = targetedElem.display;
+            tempEncList[encIndex].sampleStatusObsUuid = response.data.uuid;
+            setEncountersList(tempEncList);
+          }
+          else{
+            setEncountersList(tempEncList);
             //Need error message
           }
         }
@@ -311,42 +229,32 @@ const ReportComponent = () => {
     }
   };
 
-  const referralStatusChange = (targetedElem, encounterInfo) => {
-    tempEncList.current = cloneDeep(encountersList);
-    if (!encounterInfo.referralStatusObs) {
-      postReferralStatusChangeObs(targetedElem, encounterInfo).then(
-        (response) => {
-          if (response.ok) {
-            const encIndex = tempEncList.current.findIndex(
-              (enc) => enc.encounterUuid == encounterInfo.encounterUuid
-            );
-            tempEncList.current[encIndex].referralStatusObs =
-              targetedElem.display;
-            tempEncList.current[encIndex].referralStatusObsUuid =
-              response.data.uuid;
-            setEncountersList(tempEncList.current);
-          } else {
-            setEncountersList(tempEncList.current);
+    const referralStatusChange = (targetedElem,encounterInfo) =>{
+      const tempEncList = cloneDeep( encountersList); 
+      if(!encounterInfo.referralStatusObs){
+        postReferralStatusChangeObs(targetedElem,encounterInfo,config.referralStatusConceptUUID,config.healthCenterAttrTypeUUID).then((response) =>{
+          if(response.ok){     
+            const encIndex = tempEncList.findIndex((enc => enc.encounterUuid==encounterInfo.encounterUuid));
+            tempEncList[encIndex].referralStatusObs = targetedElem.display;
+            tempEncList[encIndex].referralStatusObsUuid = response.data.uuid;
+            setEncountersList(tempEncList);
+          }
+          else{
+            setEncountersList(tempEncList);
             //Need error message
           }
-        }
-      );
-    } else if (encounterInfo.referralStatusObs) {
-      updateReferralStatusChangeObs(targetedElem, encounterInfo).then(
-        (response) => {
-          if (response.ok) {
-            const encIndex = tempEncList.current.findIndex(
-              (enc) => enc.encounterUuid == encounterInfo.encounterUuid
-            );
-            tempEncList.current[encIndex].referralStatusObs = targetedElem
-              ? targetedElem.display
-              : "";
-            tempEncList.current[encIndex].referralStatusObsUuid = targetedElem
-              ? response.data.uuid
-              : "";
-            setEncountersList(tempEncList.current);
-          } else {
-            setEncountersList(tempEncList.current);
+        })
+      }
+      else {
+        updateReferralStatusChangeObs(targetedElem,encounterInfo,config.referralStatusConceptUUID,config.healthCenterAttrTypeUUID).then((response) =>{
+          if(response.ok){   
+            const encIndex = tempEncList.findIndex((enc => enc.encounterUuid==encounterInfo.encounterUuid));
+            tempEncList[encIndex].referralStatusObs = targetedElem.display;
+            tempEncList[encIndex].referralStatusObsUuid = response.data.uuid;
+            setEncountersList(tempEncList);
+          }
+          else{
+            setEncountersList(tempEncList);
             //Need error message
           }
         }
@@ -357,94 +265,39 @@ const ReportComponent = () => {
   return (
     <div>
       <div className={styles.filtersContainer}>
-        <select
-          className={styles.dropdown}
-          value={sendingHospital}
-          onChange={(e) => handleSendingHospital(e.target.value)}
-        >
-          <option value="" selected disabled hidden>
-            Sending Hospital
-          </option>
-          <option value=""></option>
-          {listOfHospitals.map((loc) =>
-            userLocation ? (
-              loc.uuid === userLocation ? (
-                <option value={loc.display} key={loc.uuid}>
-                  {loc.display}
-                </option>
-              ) : (
-                ""
-              )
-            ) : (
-              <option value={loc.display} key={loc.uuid}>
-                {loc.display}
-              </option>
-            )
-          )}
+        <label htmlFor="sending-hospital">Sending Hospital </label>
+        <select id="sending-hospital" className={styles.dropdown} value={sendingHospital} onChange={(e) => setSendingHospital(e.target.value)}>
+          <option value="" ></option>
+          {listOfHospitals.map((loc) => (
+            (userLocation && userLocation!== config.pathologyFullAllowedLocationName) ?  ( loc.uuid===userLocation ? 
+            <option value={loc.display} key={loc.uuid}>{loc.display}</option>:null ) :
+            <option value={loc.display} key={loc.uuid}>{loc.display}</option>
+
+          ))}
         </select>
-        <select
-          className={styles.dropdown}
-          value={sampleStatus}
-          onChange={(e) => handleSampleStatus(e.target.value)}
-        >
-          <option value="" selected disabled hidden>
-            Sample Status
-          </option>
-          <option value=""></option>
+        <label htmlFor="sample-status">Sample Status </label>
+        <select id="sample-status" className={styles.dropdown} value={sampleStatus} onChange={(e) => setSampleStatus(e.target.value)}>
+          <option value="" ></option>
           {sampleStatusResults.map((ans) => (
             <option value={ans.display} key={ans.uuid}>
               {ans.display}
             </option>
           ))}
         </select>
-        <select
-          className={styles.dropdown}
-          value={referralStatus}
-          onChange={(e) => handleReferralStatus(e.target.value)}
-        >
-          <option value="" selected disabled hidden>
-            Referral Status
-          </option>
-          <option value=""></option>
+        <label htmlFor="referral-status">Referral Status </label>
+        <select id="referral-status" className={styles.dropdown} value={referralStatus} onChange={(e) => setReferralStatus(e.target.value)}>
+          <option value="" ></option>
           {referralStatusResults.map((ans) => (
             <option value={ans.display} key={ans.uuid}>
               {ans.display}
             </option>
           ))}
         </select>
-        <input
-          className={styles.textBox}
-          type="text"
-          placeholder="Patient Name"
-          onChange={(e) => handlePatientName(e.target.value)}
-        />
+        
+        <label htmlFor="patient-name">Patient Name </label>
+        <input id="patient-name" className={styles.textBox} type='text'  onChange={(e) => setPatientName(e.target.value)}/>
       </div>
       <div className={styles.tableContainer}>
-        {/* <table className={styles.table}>
-          <thead>
-            <tr className={`omrs-bold ${styles.tr}`}>
-              <td>Link to patient</td>
-              <td>Patient name</td>
-              <td>pathology request</td>
-              <td>Sending Hospital</td>
-              <td>Phone number</td>
-              <td>Sample status</td>
-              <td>Date of Request</td>
-              <td>Referral status</td>
-              <td>Sample drop off?</td>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredEncList.map((enc) => (
-              <tr className={styles.tr} key={enc.encounterUuid}>
-                <TableRow encounterInfo={enc} sampleStatusResults={sampleStatusResults} 
-                referralStatusResults={referralStatusResults} sampleDropOffChange={sampleDropOffChange}
-                sampleStatusChange={sampleStatusChange} referralStatusChange={referralStatusChange}
-                />
-              </tr>
-            ))}
-          </tbody>
-        </table> */}
         <DataTable rows={rows} headers={headers}>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <Table {...getTableProps()}>
