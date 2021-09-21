@@ -1,26 +1,9 @@
-.table {
-    width: 100%;
-    position: relative;
-  }
   .tableContainer {
     height: 500px;
     overflow-x: auto;
     margin: 0 1rem;
     border: 2px solid lightgrey;
     border-radius: 0.25rem;
-  }
-  
-  .tr {
-    border-bottom: 1px solid lightgrey;
-    line-height: 2rem;
-  }
-  
-  .tr:nth-child(even) {
-    background-color: var(--omrs-color-bg-medium-contrast);
-  }
-  
-  .table td {
-    padding: 0.25rem 0.5rem;
   }
 
   .filtersContainer {
@@ -35,7 +18,7 @@
     border: 1px solid var(--omrs-color-ink-lowest-contrast);
     background-clip: padding-box;
     border-radius: 4px;
-    margin: 3rem;
+    margin: 1rem;
   }
   .dropdown:disabled {
     opacity: 0.8;
@@ -51,6 +34,5 @@
     border: 1px solid var(--omrs-color-ink-lowest-contrast);
     background-clip: padding-box;
     border-radius: 4px;
-    margin: 3rem;
+    margin: 1rem;
   }
-  

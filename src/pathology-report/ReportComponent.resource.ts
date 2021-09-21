@@ -1,6 +1,5 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
-import {ENCOUNTERTYPEUUID,PHONENUMBERATTRUUID,HEALTHCENTERATTRTYPEUUID,SAMPLESTATUSUUID,REFERRALSTATUSUUID,SAMPLEDROPOFFUUID,RWINKWAVUHOSPITALUUID,YESCONCEPTUUID} 
-from '../constants.js'
+
 
 
 export interface EncounterResult {
@@ -65,11 +64,11 @@ export interface Obs {
 //   return Promise.all(fullPatientEncounterData);
 // }
 
-export async function getUserLocation(){
+export async function getUserLocation(healthCenterAttrTypeUUID){
   const session = await openmrsFetch(`/ws/rest/v1/session`);
   const personUuid=session.data.user.person.uuid;
   const person = await openmrsFetch(`/ws/rest/v1/person/${personUuid}/attribute`);
-  const hcPersonAttribute = person.data.results.filter((attr) => attr.attributeType.uuid === HEALTHCENTERATTRTYPEUUID); 
+  const hcPersonAttribute = person.data.results.filter((attr) => attr.attributeType.uuid === healthCenterAttrTypeUUID); 
   return hcPersonAttribute[0] ? hcPersonAttribute[0].value.uuid : null;
 }
 
@@ -90,29 +89,29 @@ export async function getLocations() {
 //   return searchPatient.data;
 // }
 
-export async function getEncounters(): Promise<Array<EncounterResult>>{
-  const userLocationUUID = await getUserLocation();
+export async function getEncounters(healthCenterAttrTypeUUID,pathologyFullAllowedLocationName): Promise<Array<EncounterResult>>{
+  const userLocationUUID = await getUserLocation(healthCenterAttrTypeUUID);
   
   let searchEncounter=null;
-  if(userLocationUUID){
+  if(userLocationUUID && userLocationUUID != pathologyFullAllowedLocationName){
      searchEncounter = await openmrsFetch(`/ws/rest/v1/reportingrest/reportdata/996cf192-ff54-11eb-a63a-080027ce9ca0?location=${userLocationUUID}`);
   }
   else{
      searchEncounter = await openmrsFetch(`/ws/rest/v1/reportingrest/reportdata/996cf192-ff54-11eb-a63a-080027ce9ca0`);
 
   }
-  return searchEncounter.data.dataSets[0] ? searchEncounter.data.dataSets[0].rows: null;
+  return searchEncounter.data.dataSets[0].rows;
 }
 
-export async function postSampleDropoffObs(obsObject: Obs){
+export async function postSampleDropoffObs(obsObject: Obs, sampleDropOffconceptUUID,healthCenterAttrTypeUUID,yesConceptName){
   const ObsObjectTocreate = 
   {
     'person': obsObject.patientUuid,
     'obsDatetime': (new Date()).toISOString(),
-    'concept': SAMPLEDROPOFFUUID,
-    'location': await getUserLocation(),
+    'concept': sampleDropOffconceptUUID,
+    'location': await getUserLocation(healthCenterAttrTypeUUID),
     'encounter': obsObject.encounterUuid,
-    'value': YESCONCEPTUUID,
+    'value': yesConceptName,
     'voided': false
   }
   
@@ -127,13 +126,13 @@ export async function postSampleDropoffObs(obsObject: Obs){
   return response;
 }
 
-export async function voidSampleDropoff(obsObject: Obs){
+export async function voidSampleDropoff(sampleDropoffObsUuid: string){
   const ObsObjectTocreate = 
   {
     'voided': true
   }
   
-  const response = await openmrsFetch(`/ws/rest/v1/obs/${obsObject.sampleDropoffObsUuid}`,{
+  const response = await openmrsFetch(`/ws/rest/v1/obs/${sampleDropoffObsUuid}`,{
   method: 'POST',
   headers:{ 
     'content-type': 'application/json'
@@ -145,15 +144,15 @@ export async function voidSampleDropoff(obsObject: Obs){
   return response;
 }
 
-export async function postSampleStatusChangeObs(targetValue,obsObject: Obs){
+export async function postSampleStatusChangeObs(AnsUuid,obsObject: Obs,sampleStatusConceptUUID,healthCenterAttrTypeUUID){
   const ObsObjectTocreate = 
   {
     'person': obsObject.patientUuid,
     'obsDatetime': (new Date()).toISOString(),
-    'concept': SAMPLESTATUSUUID,
-    'location': await getUserLocation(),
+    'concept': sampleStatusConceptUUID,
+    'location': await getUserLocation(healthCenterAttrTypeUUID),
     'encounter': obsObject.encounterUuid,
-    'value': targetValue.uuid,
+    'value': AnsUuid,
     'voided': false
   }
   
@@ -171,13 +170,13 @@ export async function postSampleStatusChangeObs(targetValue,obsObject: Obs){
 
 
 
-export async function updateSampleStatusChangeObs(targetValue,obsObject: Obs){
+export async function updateSampleStatusChangeObs(targetValue,obsObject: Obs,sampleStatusConceptUUID,healthCenterAttrTypeUUID){
   const ObsObjectTocreate = 
   {
     'person': obsObject.patientUuid,
     'obsDatetime': (new Date()).toISOString(),
-    'concept': SAMPLESTATUSUUID,
-    'location': await getUserLocation(),
+    'concept': sampleStatusConceptUUID,
+    'location': await getUserLocation(healthCenterAttrTypeUUID),
     'encounter': obsObject.encounterUuid,
     'value': targetValue.uuid,
     'voided': targetValue ? false: true
@@ -195,13 +194,13 @@ export async function updateSampleStatusChangeObs(targetValue,obsObject: Obs){
   return response;
 }
 
-export async function postReferralStatusChangeObs(targetValue,obsObject: Obs){
+export async function postReferralStatusChangeObs(targetValue, obsObject: Obs, referralStatusConceptUUID,healthCenterAttrTypeUUID){
   const ObsObjectTocreate = 
   {
     'person': obsObject.patientUuid,
     'obsDatetime': (new Date()).toISOString(),
-    'concept': REFERRALSTATUSUUID,
-    'location': await getUserLocation(),
+    'concept': referralStatusConceptUUID,
+    'location': await getUserLocation(healthCenterAttrTypeUUID),
     'encounter': obsObject.encounterUuid,
     'value': targetValue.uuid,
     'voided': false
@@ -221,13 +220,13 @@ export async function postReferralStatusChangeObs(targetValue,obsObject: Obs){
 
 
 
-export async function updateReferralStatusChangeObs(targetValue,obsObject: Obs){
+export async function updateReferralStatusChangeObs(targetValue,obsObject: Obs, referralStatusConceptUUID,healthCenterAttrTypeUUID){
   const ObsObjectTocreate = 
   {
     'person': obsObject.patientUuid,
     'obsDatetime': (new Date()).toISOString(),
-    'concept': REFERRALSTATUSUUID,
-    'location': await getUserLocation(),
+    'concept': referralStatusConceptUUID,
+    'location': await getUserLocation(healthCenterAttrTypeUUID),
     'encounter': obsObject.encounterUuid,
     'value': targetValue.uuid,
     'voided': targetValue ? false: true
