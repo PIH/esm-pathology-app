@@ -8,7 +8,6 @@ import styles from './ReportComponent.css';
 import {  getUserLocation, getConceptAnswers, getLocations,getEncounters,postSampleDropoffObs,
   voidSampleDropoff,postSampleStatusChangeObs,updateSampleStatusChangeObs,postReferralStatusChangeObs,
   updateReferralStatusChangeObs } from './ReportComponent.resource';
-// import {RWINKWAVUHEALTHCENTERNAME,SAMPLESTATUSUUID,REFERRALSTATUSUUID,SAMPLEDROPOFFUUID,YESCONCEPTNAME,RESULTSFORMID} from '../constants.js'
 
 
 
@@ -57,7 +56,7 @@ const ReportComponent = () => {
       header: 'Sample drop off?',
     },
     {
-      key: 'resultsEncounterId',
+      key: 'resultsEncounter',
       header: 'Results',
     },
     
@@ -71,7 +70,7 @@ const ReportComponent = () => {
     getLocations().then(setListOfHospitals);
     getConceptAnswers(config.sampleStatusConceptUUID).then(setSampleStatusResults);
     getConceptAnswers(config.referralStatusConceptUUID).then(setReferralStatusResults);
-    getEncounters(config.healthCenterAttrTypeUUID).then(setEncountersList);
+    getEncounters(config.healthCenterAttrTypeUUID,config.pathologyFullAllowedLocationName).then(setEncountersList);
   }, []);
 
 
@@ -89,12 +88,24 @@ const ReportComponent = () => {
     )
     .filter(
       (encList) =>
-      !patientName || (encList.family_name && encList.family_name.toLowerCase().includes(patientName.toLowerCase())) || 
-        (encList.family_name2 && encList.family_name2.toLowerCase().includes(patientName.toLowerCase())) ||
-        (encList.middle_name && encList.middle_name.toLowerCase().includes(patientName.toLowerCase())) ||
-        (encList.given_name && encList.given_name.toLowerCase().includes(patientName.toLowerCase())),
+      // !patientName || (encList.family_name && encList.family_name.toLowerCase().includes(patientName.toLowerCase())) || 
+      //   (encList.family_name2 && encList.family_name2.toLowerCase().includes(patientName.toLowerCase())) ||
+      //   (encList.middle_name && encList.middle_name.toLowerCase().includes(patientName.toLowerCase())) ||
+      //   (encList.given_name && encList.given_name.toLowerCase().includes(patientName.toLowerCase())),
+      !patientName || ((encList.family_name+encList.middle_name+encList.given_name) && (encList.family_name+encList.middle_name+encList.given_name).toLowerCase().includes(patientName.replace(/\s+/g, '').toLowerCase())) || 
+      ((encList.family_name+encList.given_name+encList.middle_name) && (encList.family_name+encList.given_name+encList.middle_name).toLowerCase().includes(patientName.replace(/\s+/g, '').toLowerCase())) ||
+      ((encList.middle_name+encList.family_name+encList.given_name) && (encList.middle_name+encList.family_name+encList.given_name).toLowerCase().includes(patientName.replace(/\s+/g, '').toLowerCase())) ||
+      ((encList.middle_name+encList.given_name+encList.family_name) && (encList.middle_name+encList.given_name+encList.family_name).toLowerCase().includes(patientName.replace(/\s+/g, '').toLowerCase())) ||
+      ((encList.given_name+encList.family_name+encList.middle_name) && (encList.given_name+encList.family_name+encList.middle_name).toLowerCase().includes(patientName.replace(/\s+/g, '').toLowerCase())) ||
+      ((encList.given_name+encList.middle_name+encList.family_name) && (encList.given_name+encList.middle_name+encList.family_name).toLowerCase().includes(patientName.replace(/\s+/g, '').toLowerCase())),
+
+
+
+
+        // (encList.given_name && (encList.given_name+encList.family_name+encList.given_name).toLowerCase().includes(patientName.toLowerCase())),
     )
     ;
+    //replace(/\s+/g, ''); 
     // const rows = filteredEncList.map(
     //   (encounterInfo) => {
     //       return {
@@ -110,11 +121,11 @@ const ReportComponent = () => {
         // patientLink: <a href={`/openmrs/patientDashboard.form?patientId=${encounterInfo.personId}`} >Link</a>,
         id: encounterInfo.encounterId,
         patientNames: <a href={`/openmrs/patientDashboard.form?patientId=${encounterInfo.personId}`}> 
-                      {encounterInfo.family_name }{"  "}
-                      {encounterInfo.given_name  }{"  "}
-                      {encounterInfo.middle_name  }
+                      {encounterInfo.family_name}{"  "}
+                      {encounterInfo.given_name}{"  "}
+                      {encounterInfo.middle_name}
                       </a>,
-        pathologyRequest: <a href={`/openmrs/module/htmlformentry/htmlFormEntry.form?encounterId=${encounterInfo.encounterId}&mode=EDIT`}> Link </a>,
+        pathologyRequest: <a href={`/openmrs/module/htmlformentry/htmlFormEntry.form?encounterId=${encounterInfo.encounterId}&mode=VIEW`}> Link </a>,
         sendingHospital: encounterInfo.patientHealthCenter,
         phoneNumber: `${encounterInfo.patientPhoneNumber ? encounterInfo.patientPhoneNumber:''}`,
         sampleStatus: <select onChange={(e) => sampleStatusChange(e.target.value && JSON.parse(e.target.value),encounterInfo)}>
@@ -138,12 +149,10 @@ const ReportComponent = () => {
                           </select>,
         sampleDropOff: <input type="checkbox" checked={Boolean(encounterInfo.sampleDropoffObs)}
                           onChange={(e) => sampleDropOffChange(encounterInfo)}/>,
-        resultsEncounterId: encounterInfo.resultsEncounterId 
-                            ? <a href={`/openmrs/module/htmlformentry/htmlFormEntry.form?encounterId=${encounterInfo.resultsEncounterId}&mode=EDIT`}> Results </a>
-                            : <a href={`/openmrs/module/htmlformentry/htmlFormEntry.form?personId=${encounterInfo.personId}&patientId=${encounterInfo.personId}&returnUrl=&formId=${config.pathologyResultsFromID}&uuid=${encounterInfo.encounterUuid}`}> Fill in results </a>
+        resultsEncounter: encounterInfo.resultsEncounterId 
+                            ? <a href={`/openmrs/module/htmlformentry/htmlFormEntry.form?encounterId=${encounterInfo.resultsEncounterId}&mode=VIEW`}> Results </a>
+                            : !userLocation && <a href={`/openmrs/module/htmlformentry/htmlFormEntry.form?personId=${encounterInfo.personId}&patientId=${encounterInfo.personId}&returnUrl=&formId=${config.pathologyResultsFromID}&uuid=${encounterInfo.encounterUuid}`}> Fill in results </a>
                             
-                            
-
       }}
     )
 
@@ -247,31 +256,33 @@ const ReportComponent = () => {
   return (
     <div>
       <div className={styles.filtersContainer}>
-        <select className={styles.dropdown} value={sendingHospital} onChange={(e) => setSendingHospital(e.target.value)}>
-          <option value="" selected disabled hidden>Sending Hospital</option>
+        <label htmlFor="sending-hospital">Sending Hospital </label>
+        <select id="sending-hospital" className={styles.dropdown} value={sendingHospital} onChange={(e) => setSendingHospital(e.target.value)}>
           <option value="" ></option>
           {listOfHospitals.map((loc) => (
-            userLocation ?  ( loc.uuid===userLocation ? 
+            (userLocation && userLocation!== config.pathologyFullAllowedLocationName) ?  ( loc.uuid===userLocation ? 
             <option value={loc.display} key={loc.uuid}>{loc.display}</option>:null ) :
             <option value={loc.display} key={loc.uuid}>{loc.display}</option>
 
           ))}
         </select>
-        <select className={styles.dropdown} value={sampleStatus} onChange={(e) => setSampleStatus(e.target.value)}>
-          <option value="" selected disabled hidden>Sample Status</option>
+        <label htmlFor="sample-status">Sample Status </label>
+        <select id="sample-status" className={styles.dropdown} value={sampleStatus} onChange={(e) => setSampleStatus(e.target.value)}>
           <option value="" ></option>
           {sampleStatusResults.map((ans) => (
             <option value={ans.display} key={ans.uuid}>{ans.display}</option>
           ))}
         </select>
-        <select className={styles.dropdown} value={referralStatus} onChange={(e) => setReferralStatus(e.target.value)}>
-          <option value="" selected disabled hidden>Referral Status</option>
+        <label htmlFor="referral-status">Referral Status </label>
+        <select id="referral-status" className={styles.dropdown} value={referralStatus} onChange={(e) => setReferralStatus(e.target.value)}>
           <option value="" ></option>
           {referralStatusResults.map((ans) => (
             <option value={ans.display} key={ans.uuid}>{ans.display}</option>
           ))}
         </select>
-        <input className={styles.textBox} type='text' placeholder='Patient Name' onChange={(e) => setPatientName(e.target.value)}/>
+        
+        <label htmlFor="patient-name">Patient Name </label>
+        <input id="patient-name" className={styles.textBox} type='text'  onChange={(e) => setPatientName(e.target.value)}/>
       </div>
       <div className={styles.tableContainer}>
         <DataTable rows={rows} headers={headers}>

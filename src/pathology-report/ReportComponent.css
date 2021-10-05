@@ -18,7 +18,7 @@
     border: 1px solid var(--omrs-color-ink-lowest-contrast);
     background-clip: padding-box;
     border-radius: 4px;
-    margin: 3rem;
+    margin: 1rem;
   }
   .dropdown:disabled {
     opacity: 0.8;
@@ -34,5 +34,5 @@
     border: 1px solid var(--omrs-color-ink-lowest-contrast);
     background-clip: padding-box;
     border-radius: 4px;
-    margin: 3rem;
+    margin: 1rem;
   }

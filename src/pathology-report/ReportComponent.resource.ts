@@ -1,6 +1,5 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
-import {ENCOUNTERTYPEUUID,PHONENUMBERATTRUUID,HEALTHCENTERATTRTYPEUUID,SAMPLESTATUSUUID,REFERRALSTATUSUUID,SAMPLEDROPOFFUUID,RWINKWAVUHOSPITALUUID,YESCONCEPTUUID} 
-from '../constants.js'
+
 
 
 export interface EncounterResult {
@@ -90,11 +89,11 @@ export async function getLocations() {
 //   return searchPatient.data;
 // }
 
-export async function getEncounters(healthCenterAttrTypeUUID): Promise<Array<EncounterResult>>{
+export async function getEncounters(healthCenterAttrTypeUUID,pathologyFullAllowedLocationName): Promise<Array<EncounterResult>>{
   const userLocationUUID = await getUserLocation(healthCenterAttrTypeUUID);
   
   let searchEncounter=null;
-  if(userLocationUUID){
+  if(userLocationUUID && userLocationUUID != pathologyFullAllowedLocationName){
      searchEncounter = await openmrsFetch(`/ws/rest/v1/reportingrest/reportdata/996cf192-ff54-11eb-a63a-080027ce9ca0?location=${userLocationUUID}`);
   }
   else{

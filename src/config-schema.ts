@@ -31,6 +31,11 @@ export const configSchema = {
     _default: '8d87236c-c2cc-11de-8d13-0010c6dffd0f',
     _description: 'This is to determine the UUID of the Health center attribute type in the instance',
   },
+  pathologyFullAllowedLocationUuid: {
+    _type: Type.String,
+    _default: '38c4b94b-97a6-4f2c-bca6-c28a37cf60ed',
+    _description: 'This is to determine the location allowed to view all other location data',
+  },
   sampleStatusConceptUUID:   {
     _type: Type.String,
     _default: '3ce163d8-26fe-102b-80cb-0017a47871b2',
@@ -68,6 +73,7 @@ export const configSchema = {
 export type Config = {
   pathologyEncTypeUUID: string;
   healthCenterAttrTypeUUID: string;
+  pathologyFullAllowedLocationName: string;
   sampleStatusConceptUUID: string;
   referralStatusConceptUUID: string;
   sampleDropOffconceptUUID: string;

@@ -120,9 +120,11 @@ describe("pathology request list", () => {
     beforeEach(() =>{
         mockedGetEncounters.mockReset();
         mockedGetEncounters.mockReset();
-        mockedGetEncounters.mockReturnValue(of(encountersList));
-        mockedGetLocations.mockReturnValue(of(locationList));
-        mockedGetConceptAnswers.mockReturnValue(conceptList);
+        mockedGetUserLocation.mockReset();
+        mockedGetEncounters.mockReturnValue(new Promise(() => encountersList));
+        mockedGetLocations.mockReturnValue(new Promise(() =>locationList));
+        mockedGetConceptAnswers.mockReturnValue(new Promise(() => conceptList));
+        mockedGetUserLocation.mockReturnValue(new Promise(() => "777984f1-fbee-4de7-aadf-39ac36a89680"));
 
         render(<ReportComponent/>)
     });
@@ -182,7 +184,7 @@ describe("pathology request list", () => {
     })
 
     it("filters by sending hospital", () => {
-        const dropdown = screen.queryByDisplayValue("Sending Hospital");
+        const dropdown = screen.getByLabelText("Sending Hospital", { selector: "select" });
         fireEvent.change(dropdown, { target: { value: "Bukora Health Center" } });
         expect(screen.queryByText("REBERO Emille")).toBeNull();
         expect(screen.queryByText("MUKAMUSONERA Jacqueline")).not.toBeNull();
@@ -190,7 +192,7 @@ describe("pathology request list", () => {
     });
 
     it("filters by sample status", () => {
-        const dropdown = screen.queryByDisplayValue("Sample Status");
+        const dropdown = screen.getByLabelText("Sample Status", { selector: "select" });
         fireEvent.change(dropdown, { target: { value: "UNKNOWN" } });
         expect(screen.queryByText("REBERO Emille")).toBeNull();
         expect(screen.queryByText("MUKAMUSONERA Jacqueline")).not.toBeNull();
@@ -198,7 +200,7 @@ describe("pathology request list", () => {
     });
 
     it("filters by referral status", () => {
-        const dropdown = screen.queryByDisplayValue("Referral Status");
+        const dropdown = screen.getByLabelText("Referral Status", { selector: "select" });
         fireEvent.change(dropdown, { target: { value: "CONTINUE REGIMEN" } });
         expect(screen.queryByText("REBERO Emille")).toBeNull();
         expect(screen.queryByText("MUKAMUSONERA Jacqueline")).not.toBeNull();
@@ -206,7 +208,7 @@ describe("pathology request list", () => {
     });
 
     it("filters by patient name", () => {
-        const textBox = screen.getByPlaceholderText("Patient Name");
+        const textBox = screen.getByLabelText("Patient Name");
         fireEvent.change(textBox, { target: { value: "NKOMEJE" } });
         expect(screen.queryByText("REBERO Emille")).toBeNull();
         expect(screen.queryByText("MUKAMUSONERA Jacqueline")).toBeNull();
@@ -225,7 +227,7 @@ describe("pathology request list", () => {
         expect(screen.queryByDisplayValue("UNKNOWN")).not.toBeNull();
     });
 
-    it("infers list of sample status", () => {
+    it("infers list of Referral status", () => {
         const dropdown = screen.queryByDisplayValue("Referral Status");
         fireEvent.change(dropdown, { target: { value: "CONTINUE REGIMEN" } });
         expect(screen.queryByDisplayValue("CONTINUE REGIMEN")).not.toBeNull();
