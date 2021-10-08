@@ -1,11 +1,11 @@
 import React from "react";
 import {
   render,
-  fireEvent,
   screen,
   within,
   waitFor,
 } from "@testing-library/react";
+import userEvent from '@testing-library/user-event'
 import {
   getUserLocation,
   getConceptAnswers,
@@ -128,11 +128,6 @@ describe("pathology request list", () => {
 
     render(<ReportComponent />);
   });
-  afterEach(() => {});
-
-  it("renders without failing", () => {
-    // in beforEach
-  });
 
   it("renders the expected fields", async () => {
     const row = await screen
@@ -172,7 +167,7 @@ describe("pathology request list", () => {
           encountersList[0].middle_name
       )
     );
-    fireEvent.click(patientDashLink);
+    userEvent.click(patientDashLink);
     await waitFor(() => {
       expect(patientDashLink.closest("a")).toHaveAttribute(
         "href",
@@ -180,7 +175,7 @@ describe("pathology request list", () => {
       );
     });
     const resultsFormLink = within(table).getByTestId("resultsEncounter");
-    fireEvent.click(resultsFormLink);
+    userEvent.click(resultsFormLink);
     await waitFor(() => {
       expect(resultsFormLink.closest("a")).toHaveAttribute(
         "href",
@@ -195,63 +190,58 @@ describe("pathology request list", () => {
     const dropdown = screen.getByLabelText("Sending Hospital", {
       selector: "select",
     });
-    fireEvent.change(dropdown, { target: { value: "Bukora Health Center" } });
-    expect(screen.queryByText("REBERO Emille")).toBeNull();
-    expect(screen.queryByText("MUKAMUSONERA Jacqueline")).not.toBeNull();
-    expect(screen.queryByText("NKOMEJE Evariste")).not.toBeNull();
+    userEvent.selectOptions(dropdown, "Bukora Health Center");
+    expect(screen.queryByText("REBERO Emille")).not.toBeInTheDocument();
+    expect(screen.queryByText("MUKAMUSONERA Jacqueline")).toBeInTheDocument();
+    expect(screen.queryByText("NKOMEJE Evariste")).toBeInTheDocument();
   });
 
   it("filters by sample status", () => {
     const dropdown = screen.getByLabelText("Sample Status", {
       selector: "select",
     });
-    fireEvent.change(dropdown, { target: { value: "UNKNOWN" } });
-    expect(screen.queryByText("REBERO Emille")).toBeNull();
-    expect(screen.queryByText("MUKAMUSONERA Jacqueline")).not.toBeNull();
-    expect(screen.queryByText("NKOMEJE Evariste")).not.toBeNull();
+    userEvent.selectOptions(dropdown, "UNKNOWN");
+    expect(screen.queryByText("REBERO Emille")).not.toBeInTheDocument();
+    expect(screen.queryByText("MUKAMUSONERA Jacqueline")).toBeInTheDocument();
+    expect(screen.queryByText("NKOMEJE Evariste")).toBeInTheDocument();
   });
 
   it("filters by referral status", () => {
     const dropdown = screen.getByLabelText("Referral Status", {
       selector: "select",
     });
-    fireEvent.change(dropdown, { target: { value: "CONTINUE REGIMEN" } });
-    expect(screen.queryByText("REBERO Emille")).toBeNull();
-    expect(screen.queryByText("MUKAMUSONERA Jacqueline")).not.toBeNull();
-    expect(screen.queryByText("NKOMEJE Evariste")).not.toBeNull();
+    userEvent.selectOptions(dropdown, "CONTINUE REGIMEN");
+    expect(screen.queryByText("REBERO Emille")).not.toBeInTheDocument();
+    expect(screen.queryByText("MUKAMUSONERA Jacqueline")).toBeInTheDocument();
+    expect(screen.queryByText("NKOMEJE Evariste")).toBeInTheDocument();
   });
 
-  it("filters by patient name", () => {
+  it("filters by patient name", async () => {
     const textBox = screen.getByLabelText("Patient Name");
-    fireEvent.change(textBox, { target: { value: "NKOMEJE" } });
-    expect(screen.queryByText("REBERO Emille")).toBeNull();
-    expect(screen.queryByText("MUKAMUSONERA Jacqueline")).toBeNull();
-    expect(screen.queryByText("NKOMEJE Evariste")).not.toBeNull();
+    userEvent.type(textBox, "NKOMEJE");
+    expect(screen.queryByText("REBERO Emille")).not.toBeInTheDocument();
+    expect(screen.queryByText("MUKAMUSONERA Jacqueline")).not.toBeInTheDocument();
+    expect(screen.queryByText("NKOMEJE Evariste")).toBeInTheDocument();
   });
 
   it("infers list of sending hospital", async () => {
     const dropdown = screen.getByLabelText("Sending Hospital", {
       selector: "select",
     });
-    fireEvent.change(dropdown, { target: { value: "Bukora Health Center" } });
-    await waitFor(() => {
-      expect(dropdown).toHaveDisplayValue("Bukora Health Center");
-    });
+    userEvent.selectOptions(dropdown, "Bukora Health Center");
   });
 
   it("infers list of sample status", () => {
     const dropdown = screen.getByLabelText("Sample Status", {
       selector: "select",
     });
-    fireEvent.change(dropdown, { target: { value: "UNKNOWN" } });
-    expect(dropdown).toHaveDisplayValue("UNKNOWN");
+    userEvent.selectOptions(dropdown, "UNKNOWN");
   });
 
   it("infers list of Referral status", () => {
     const dropdown = screen.getByLabelText("Referral Status", {
       selector: "select",
     });
-    fireEvent.change(dropdown, { target: { value: "CONTINUE REGIMEN" } });
-    expect(dropdown).toHaveDisplayValue("CONTINUE REGIMEN");
+    userEvent.selectOptions(dropdown, "CONTINUE REGIMEN");
   });
 });
