@@ -3,5 +3,5 @@
 
 set -e
 
-npm run prettier
+npx pretty-quick
 npx concurrently 'npm:lint' 'npm:test' 'npm:typescript'

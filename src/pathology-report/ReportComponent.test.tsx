@@ -1,11 +1,6 @@
 import React from 'react';
 import { render, fireEvent, screen, within, waitFor } from '@testing-library/react';
-import {
-  getUserLocation,
-  getConceptAnswers,
-  getLocations,
-  getEncounters,
-} from './ReportComponent.resource';
+import { getUserLocation, getConceptAnswers, getLocations, getEncounters } from './ReportComponent.resource';
 import ReportComponent from './ReportComponent';
 import { configSchema } from '../config-schema';
 
