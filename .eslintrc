@@ -1,5 +1,5 @@
 {
-  "extends": ["ts-react-important-stuff", "plugin:prettier/recommended"],
+  "extends": ["ts-react-important-stuff", "prettier"],
   "parser": "@typescript-eslint/parser",
   "ignorePatterns": ["*.d.tsx"]
 }

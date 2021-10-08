@@ -170,7 +170,8 @@ const ReportComponent = () => {
               data-testid="sampleStatus-option"
               value={`{"uuid": "${ans.uuid}","display": "${ans.display}"}`}
               key={ans.uuid}
-              selected={encounterInfo.sampleStatusObs ? encounterInfo.sampleStatusObs === ans.display && true : false}>
+              selected={encounterInfo.sampleStatusObs ? encounterInfo.sampleStatusObs === ans.display && true : false}
+            >
               {ans.display}
             </option>
           ))}
@@ -184,7 +185,8 @@ const ReportComponent = () => {
             <option
               value={`{"uuid": "${ans.uuid}","display": "${ans.display}"}`}
               key={ans.uuid}
-              selected={encounterInfo.referralStatusObs && encounterInfo.referralStatusObs === ans.display}>
+              selected={encounterInfo.referralStatusObs && encounterInfo.referralStatusObs === ans.display}
+            >
               {ans.display}
             </option>
           ))}
@@ -201,14 +203,16 @@ const ReportComponent = () => {
       resultsEncounter: encounterInfo.resultsEncounterId ? (
         <a
           data-testid="resultsEncounter"
-          href={`/openmrs/module/htmlformentry/htmlFormEntry.form?encounterId=${encounterInfo.resultsEncounterId}&mode=VIEW`}>
+          href={`/openmrs/module/htmlformentry/htmlFormEntry.form?encounterId=${encounterInfo.resultsEncounterId}&mode=VIEW`}
+        >
           {' '}
           Results{' '}
         </a>
       ) : (
         !userLocation && (
           <a
-            href={`/openmrs/module/htmlformentry/htmlFormEntry.form?personId=${encounterInfo.personId}&patientId=${encounterInfo.personId}&returnUrl=&formId=${config.pathologyResultsFromID}&uuid=${encounterInfo.encounterUuid}`}>
+            href={`/openmrs/module/htmlformentry/htmlFormEntry.form?personId=${encounterInfo.personId}&patientId=${encounterInfo.personId}&returnUrl=&formId=${config.pathologyResultsFromID}&uuid=${encounterInfo.encounterUuid}`}
+          >
             {' '}
             Fill in results{' '}
           </a>
@@ -333,7 +337,8 @@ const ReportComponent = () => {
           id="sending-hospital"
           className={styles.dropdown}
           value={sendingHospital}
-          onChange={(e) => setSendingHospital(e.target.value)}>
+          onChange={(e) => setSendingHospital(e.target.value)}
+        >
           <option value=""></option>
           {listOfHospitals.map((loc) =>
             userLocation && userLocation !== config.pathologyFullAllowedLocationName ? (
@@ -354,7 +359,8 @@ const ReportComponent = () => {
           id="sample-status"
           className={styles.dropdown}
           value={sampleStatus}
-          onChange={(e) => setSampleStatus(e.target.value)}>
+          onChange={(e) => setSampleStatus(e.target.value)}
+        >
           <option value=""></option>
           {sampleStatusResults.map((ans) => (
             <option value={ans.display} key={ans.uuid}>
@@ -367,7 +373,8 @@ const ReportComponent = () => {
           id="referral-status"
           className={styles.dropdown}
           value={referralStatus}
-          onChange={(e) => setReferralStatus(e.target.value)}>
+          onChange={(e) => setReferralStatus(e.target.value)}
+        >
           <option value=""></option>
           {referralStatusResults.map((ans) => (
             <option value={ans.display} key={ans.uuid}>

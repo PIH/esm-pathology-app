@@ -36,38 +36,37 @@ export const configSchema = {
     _default: '38c4b94b-97a6-4f2c-bca6-c28a37cf60ed',
     _description: 'This is to determine the location allowed to view all other location data',
   },
-  sampleStatusConceptUUID:   {
+  sampleStatusConceptUUID: {
     _type: Type.String,
     _default: '3ce163d8-26fe-102b-80cb-0017a47871b2',
     _description: 'This is to determine the UUID of the sample status concept in the instance',
   },
-  referralStatusConceptUUID:   {
+  referralStatusConceptUUID: {
     _type: Type.String,
     _default: '3cd93302-26fe-102b-80cb-0017a47871b2',
     _description: 'This is to determine the UUID of the referral status concept in the instance',
   },
-  sampleDropOffconceptUUID:   {
+  sampleDropOffconceptUUID: {
     _type: Type.String,
     _default: '13662f27-9be5-4595-8bab-07b0e859d9f4',
     _description: 'This is to determine the UUID of the sample drop off concept in the instance',
-  },  
-  yesConceptUUID:   {
+  },
+  yesConceptUUID: {
     _type: Type.String,
     _default: '3cd6f600-26fe-102b-80cb-0017a47871b2',
     _description: 'This is to determine the UUID of the Yes concept in the instance',
   },
-  yesConceptName:   {
+  yesConceptName: {
     _type: Type.String,
     _default: 'YES',
     _description: 'This is to determine the Name of the Yes concept in the instance',
   },
-  
-  pathologyResultsFromID:   {
+
+  pathologyResultsFromID: {
     _type: Type.Number,
     _default: 131,
     _description: 'This is to determine the ID of the pathology results form in the instance',
   },
-
 };
 
 export type Config = {
@@ -80,5 +79,4 @@ export type Config = {
   yesConceptUUID: string;
   yesConceptName: string;
   pathologyResultsFromID: number;
-
 };
