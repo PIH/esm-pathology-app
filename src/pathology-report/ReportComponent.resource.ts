@@ -3,7 +3,7 @@ import { openmrsFetch } from "@openmrs/esm-framework";
 export interface EncounterResult {
   family_name: string;
   given_name: string;
-  middle__name: string;
+  middle_name: string;
   patientPhoneNumber: { value: string };
   patientHealthCenter: string;
   patientUuid: string;
@@ -21,6 +21,7 @@ export interface Patient {
 export interface Concept {
   uuid: string;
   name: string;
+  display: string;
 }
 export interface Obs {
   patientUuid: string;
@@ -71,7 +72,7 @@ export async function getUserLocation(healthCenterAttrTypeUUID) {
   const hcPersonAttribute = person.data.results.filter(
     (attr) => attr.attributeType.uuid === healthCenterAttrTypeUUID
   );
-  return hcPersonAttribute[0] ? hcPersonAttribute[0].value.uuid : null;
+  return hcPersonAttribute[0]?.value.uuid;
 }
 
 export async function getConceptAnswers(conceptUuid) {
@@ -93,15 +94,15 @@ export async function getLocations() {
 // }
 
 export async function getEncounters(
-  healthCenterAttrTypeUUID,
-  pathologyFullAllowedLocationName
+  healthCenterAttrTypeUUID: string,
+  pathologyFullAllowedLocationUUID: string
 ): Promise<Array<EncounterResult>> {
   const userLocationUUID = await getUserLocation(healthCenterAttrTypeUUID);
 
   let searchEncounter = null;
   if (
     userLocationUUID &&
-    userLocationUUID != pathologyFullAllowedLocationName
+    userLocationUUID != pathologyFullAllowedLocationUUID
   ) {
     searchEncounter = await openmrsFetch(
       `/ws/rest/v1/reportingrest/reportdata/996cf192-ff54-11eb-a63a-080027ce9ca0?location=${userLocationUUID}`
@@ -116,9 +117,9 @@ export async function getEncounters(
 
 export async function postSampleDropoffObs(
   obsObject: Obs,
-  sampleDropOffconceptUUID,
-  healthCenterAttrTypeUUID,
-  yesConceptName
+  sampleDropOffconceptUUID: string,
+  healthCenterAttrTypeUUID: string,
+  yesConceptName: string
 ) {
   const ObsObjectTocreate = {
     person: obsObject.patientUuid,
@@ -160,18 +161,18 @@ export async function voidSampleDropoff(sampleDropoffObsUuid: string) {
 }
 
 export async function postSampleStatusChangeObs(
-  AnsUuid,
-  obsObject: Obs,
-  sampleStatusConceptUUID,
-  healthCenterAttrTypeUUID
+  newStatusUuid: string,
+  obs: Obs,
+  sampleStatusConceptUUID: string,
+  healthCenterAttrTypeUUID: string
 ) {
-  const ObsObjectTocreate = {
-    person: obsObject.patientUuid,
+  const postBody = {
+    person: obs.patientUuid,
     obsDatetime: new Date().toISOString(),
     concept: sampleStatusConceptUUID,
     location: await getUserLocation(healthCenterAttrTypeUUID),
-    encounter: obsObject.encounterUuid,
-    value: AnsUuid,
+    encounter: obs.encounterUuid,
+    value: newStatusUuid,
     voided: false,
   };
 
@@ -180,17 +181,17 @@ export async function postSampleStatusChangeObs(
     headers: {
       "content-type": "application/json",
     },
-    body: ObsObjectTocreate,
+    body: postBody,
   });
 
   return response;
 }
 
 export async function updateSampleStatusChangeObs(
-  targetValue,
+  newStatus: null | { uuid: string; display: string },
   obsObject: Obs,
-  sampleStatusConceptUUID,
-  healthCenterAttrTypeUUID
+  sampleStatusConceptUUID: string,
+  healthCenterAttrTypeUUID: string
 ) {
   const ObsObjectTocreate = {
     person: obsObject.patientUuid,
@@ -198,8 +199,8 @@ export async function updateSampleStatusChangeObs(
     concept: sampleStatusConceptUUID,
     location: await getUserLocation(healthCenterAttrTypeUUID),
     encounter: obsObject.encounterUuid,
-    value: targetValue.uuid,
-    voided: targetValue ? false : true,
+    value: newStatus.uuid,
+    voided: newStatus ? false : true,
   };
 
   const response = await openmrsFetch(
@@ -217,10 +218,10 @@ export async function updateSampleStatusChangeObs(
 }
 
 export async function postReferralStatusChangeObs(
-  targetValue,
+  targetValueUuid: string,
   obsObject: Obs,
-  referralStatusConceptUUID,
-  healthCenterAttrTypeUUID
+  referralStatusConceptUUID: string,
+  healthCenterAttrTypeUUID: string
 ) {
   const ObsObjectTocreate = {
     person: obsObject.patientUuid,
@@ -228,7 +229,7 @@ export async function postReferralStatusChangeObs(
     concept: referralStatusConceptUUID,
     location: await getUserLocation(healthCenterAttrTypeUUID),
     encounter: obsObject.encounterUuid,
-    value: targetValue.uuid,
+    value: targetValueUuid,
     voided: false,
   };
 

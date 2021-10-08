@@ -1,12 +1,6 @@
 import { Type, validator } from "@openmrs/esm-framework";
 
 /**
- * This is the config schema. It expects a configuration object which
- * looks like this:
- *
- * ```json
- * { "casualGreeting": true, "whoToGreet": ["Mom"] }
- * ```
  *
  * In OpenMRS Microfrontends, all config parameters are optional. Thus,
  * all elements must have a reasonable default. A good default is one
@@ -33,7 +27,7 @@ export const configSchema = {
     _description:
       "This is to determine the UUID of the Health center attribute type in the instance",
   },
-  pathologyFullAllowedLocationUuid: {
+  pathologyFullAllowedLocationUUID: {
     _type: Type.String,
     _default: "38c4b94b-97a6-4f2c-bca6-c28a37cf60ed",
     _description:
@@ -81,7 +75,7 @@ export const configSchema = {
 export type Config = {
   pathologyEncTypeUUID: string;
   healthCenterAttrTypeUUID: string;
-  pathologyFullAllowedLocationName: string;
+  pathologyFullAllowedLocationUUID: string;
   sampleStatusConceptUUID: string;
   referralStatusConceptUUID: string;
   sampleDropOffconceptUUID: string;

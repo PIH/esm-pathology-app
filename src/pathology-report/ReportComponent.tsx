@@ -22,16 +22,25 @@ import {
   updateSampleStatusChangeObs,
   postReferralStatusChangeObs,
   updateReferralStatusChangeObs,
+  EncounterResult,
+  Concept,
 } from "./ReportComponent.resource";
+import { Config } from "../config-schema";
 
 const ReportComponent = () => {
-  const config = useConfig();
+  const config = useConfig() as Config;
   const [userLocation, setUserLocation] = React.useState();
-  const [encountersList, setEncountersList] = React.useState([]);
+  const [encountersList, setEncountersList] = React.useState<
+    Array<EncounterResult>
+  >([]);
   const [sendingHospital, setSendingHospital] = React.useState("");
   const [listOfHospitals, setListOfHospitals] = React.useState([]);
-  const [sampleStatusResults, setSampleStatusResults] = React.useState([]);
-  const [referralStatusResults, setReferralStatusResults] = React.useState([]);
+  const [sampleStatusAnswers, setSampleStatusAnswers] = React.useState<
+    Array<Concept>
+  >([]);
+  const [referralStatusAnswers, setReferralStatusAnswers] = React.useState<
+    Array<Concept>
+  >([]);
   const [sampleStatus, setSampleStatus] = React.useState("");
   const [referralStatus, setReferralStatus] = React.useState("");
   const [patientName, setPatientName] = React.useState("");
@@ -78,14 +87,14 @@ const ReportComponent = () => {
     getUserLocation(config.healthCenterAttrTypeUUID).then(setUserLocation);
     getLocations().then(setListOfHospitals);
     getConceptAnswers(config.sampleStatusConceptUUID).then(
-      setSampleStatusResults
+      setSampleStatusAnswers
     );
     getConceptAnswers(config.referralStatusConceptUUID).then(
-      setReferralStatusResults
+      setReferralStatusAnswers
     );
     getEncounters(
       config.healthCenterAttrTypeUUID,
-      config.pathologyFullAllowedLocationName
+      config.pathologyFullAllowedLocationUUID
     ).then(setEncountersList);
   }, []);
 
@@ -153,23 +162,24 @@ const ReportComponent = () => {
         </a>
       ),
       sendingHospital: encounterInfo.patientHealthCenter,
-      phoneNumber: `${
-        encounterInfo.patientPhoneNumber ? encounterInfo.patientPhoneNumber : ""
-      }`,
+      phoneNumber: encounterInfo.patientPhoneNumber || "",
       sampleStatus: (
         <select
           onChange={(e) =>
             sampleStatusChange(
-              e.target.value && JSON.parse(e.target.value),
+              {
+                uuid: e.target.value,
+                display: e.target.options[e.target.selectedIndex].text,
+              },
               encounterInfo
             )
           }
         >
           <option value=""></option>
-          {sampleStatusResults.map((ans) => (
+          {sampleStatusAnswers.map((ans) => (
             <option
               data-testid="sampleStatus-option"
-              value={`{"uuid": "${ans.uuid}","display": "${ans.display}"}`}
+              value={ans.uuid}
               key={ans.uuid}
               selected={
                 encounterInfo.sampleStatusObs
@@ -187,15 +197,18 @@ const ReportComponent = () => {
         <select
           onChange={(e) =>
             referralStatusChange(
-              e.target.value && JSON.parse(e.target.value),
+              {
+                uuid: e.target.value,
+                display: e.target.options[e.target.selectedIndex].text,
+              },
               encounterInfo
             )
           }
         >
           <option data-testid="referralStatus-option" value=""></option>
-          {referralStatusResults.map((ans) => (
+          {referralStatusAnswers.map((ans) => (
             <option
-              value={`{"uuid": "${ans.uuid}","display": "${ans.display}"}`}
+              value={ans.uuid}
               key={ans.uuid}
               selected={
                 encounterInfo.referralStatusObs &&
@@ -269,11 +282,14 @@ const ReportComponent = () => {
     }
   };
 
-  const sampleStatusChange = (targetedElem, encounterInfo) => {
+  const sampleStatusChange = (
+    newStatus: { uuid: string; display: string },
+    encounterInfo
+  ) => {
     const tempEncList = cloneDeep(encountersList);
     if (!encounterInfo.sampleStatusObs) {
       postSampleStatusChangeObs(
-        targetedElem.uuid,
+        newStatus.uuid,
         encounterInfo,
         config.sampleStatusConceptUUID,
         config.healthCenterAttrTypeUUID
@@ -282,7 +298,7 @@ const ReportComponent = () => {
           const encIndex = tempEncList.findIndex(
             (enc) => enc.encounterUuid == encounterInfo.encounterUuid
           );
-          tempEncList[encIndex].sampleStatusObs = targetedElem.display;
+          tempEncList[encIndex].sampleStatusObs = newStatus.display;
           tempEncList[encIndex].sampleStatusObsUuid = response.data.uuid;
 
           setEncountersList(tempEncList);
@@ -293,7 +309,7 @@ const ReportComponent = () => {
       });
     } else {
       updateSampleStatusChangeObs(
-        targetedElem,
+        newStatus,
         encounterInfo,
         config.sampleStatusConceptUUID,
         config.healthCenterAttrTypeUUID
@@ -302,7 +318,7 @@ const ReportComponent = () => {
           const encIndex = tempEncList.findIndex(
             (enc) => enc.encounterUuid == encounterInfo.encounterUuid
           );
-          tempEncList[encIndex].sampleStatusObs = targetedElem.display;
+          tempEncList[encIndex].sampleStatusObs = newStatus.display;
           tempEncList[encIndex].sampleStatusObsUuid = response.data.uuid;
           setEncountersList(tempEncList);
         } else {
@@ -317,7 +333,7 @@ const ReportComponent = () => {
     const tempEncList = cloneDeep(encountersList);
     if (!encounterInfo.referralStatusObs) {
       postReferralStatusChangeObs(
-        targetedElem,
+        targetedElem.uuid,
         encounterInfo,
         config.referralStatusConceptUUID,
         config.healthCenterAttrTypeUUID
@@ -369,7 +385,7 @@ const ReportComponent = () => {
           <option value=""></option>
           {listOfHospitals.map((loc) =>
             userLocation &&
-            userLocation !== config.pathologyFullAllowedLocationName ? (
+            userLocation !== config.pathologyFullAllowedLocationUUID ? (
               loc.uuid === userLocation ? (
                 <option value={loc.display} key={loc.uuid}>
                   {loc.display}
@@ -390,7 +406,7 @@ const ReportComponent = () => {
           onChange={(e) => setSampleStatus(e.target.value)}
         >
           <option value=""></option>
-          {sampleStatusResults.map((ans) => (
+          {sampleStatusAnswers.map((ans) => (
             <option value={ans.display} key={ans.uuid}>
               {ans.display}
             </option>
@@ -404,7 +420,7 @@ const ReportComponent = () => {
           onChange={(e) => setReferralStatus(e.target.value)}
         >
           <option value=""></option>
-          {referralStatusResults.map((ans) => (
+          {referralStatusAnswers.map((ans) => (
             <option value={ans.display} key={ans.uuid}>
               {ans.display}
             </option>
