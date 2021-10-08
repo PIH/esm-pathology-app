@@ -212,13 +212,20 @@ describe("pathology request list", () => {
   });
 
   it("filters by patient name", async () => {
-    const textBox = screen.getByLabelText("Patient Name");
+    const textBox = screen.getByLabelText("Patient Name") as HTMLInputElement;
     userEvent.type(textBox, "NKOMEJE");
     expect(screen.queryByText("REBERO Emille")).not.toBeInTheDocument();
     expect(
       screen.queryByText("MUKAMUSONERA Jacqueline")
     ).not.toBeInTheDocument();
     expect(screen.queryByText("NKOMEJE Evariste")).toBeInTheDocument();
+
+    textBox.setSelectionRange(0, textBox.value.length); // clear input
+    userEvent.type(textBox, "jac muk");
+    expect(textBox.value).toBe("jac muk"); // sanity check
+    expect(screen.queryByText("REBERO Emille")).not.toBeInTheDocument();
+    expect(screen.queryByText("MUKAMUSONERA Jacqueline")).toBeInTheDocument();
+    expect(screen.queryByText("NKOMEJE Evariste")).not.toBeInTheDocument();
   });
 
   it("infers list of sending hospital", async () => {
