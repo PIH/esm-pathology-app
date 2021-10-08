@@ -10,7 +10,7 @@
     "start": "openmrs develop --backend http://192.168.33.21:8080/",
     "serve": "webpack serve --mode=development",
     "build": "webpack --mode production",
-    "analyze": "webpack --mode=production --env.analyze=true",
+    "analyze": "webpack --mode=production --env analyze=true",
     "lint": "eslint src --ext js,jsx,ts,tsx",
     "prettier": "prettier --config prettier.config.js --write \"src/**/*.{ts,tsx}\"",
     "typescript": "tsc",
