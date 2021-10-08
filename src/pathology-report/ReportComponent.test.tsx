@@ -1,33 +1,19 @@
 import React from 'react';
-import { of } from 'rxjs';
-import { useConfig } from '@openmrs/esm-framework';
-
 import { render, fireEvent, screen, within, waitFor } from '@testing-library/react';
 import {
   getUserLocation,
   getConceptAnswers,
   getLocations,
   getEncounters,
-  postSampleDropoffObs,
-  voidSampleDropoff,
-  postSampleStatusChangeObs,
-  updateSampleStatusChangeObs,
-  postReferralStatusChangeObs,
-  updateReferralStatusChangeObs,
 } from './ReportComponent.resource';
 import ReportComponent from './ReportComponent';
+import { configSchema } from '../config-schema';
 
 jest.mock('./ReportComponent.resource');
 const mockedGetUserLocation = getUserLocation as jest.Mock;
 const mockedGetConceptAnswers = getConceptAnswers as jest.Mock;
 const mockedGetLocations = getLocations as jest.Mock;
 const mockedGetEncounters = getEncounters as jest.Mock;
-const mockedPostSampleDropoffObs = postSampleDropoffObs as jest.Mock;
-const mockedVoidSampleDropoff = voidSampleDropoff as jest.Mock;
-const mockedPostSampleStatusChangeObs = postSampleStatusChangeObs as jest.Mock;
-const mockedUpdateSampleStatusChangeObs = updateSampleStatusChangeObs as jest.Mock;
-const mockedPostReferralStatusChangeObs = postReferralStatusChangeObs as jest.Mock;
-const mockedUpdateReferralStatusChangeObs = updateReferralStatusChangeObs as jest.Mock;
 
 const encountersList = [
   {
@@ -119,7 +105,6 @@ const conceptList = [
     display: 'START DRUGS',
   },
 ];
-const config = useConfig();
 describe('pathology request list', () => {
   beforeEach(() => {
     mockedGetEncounters.mockReset();
@@ -184,7 +169,7 @@ describe('pathology request list', () => {
         'href',
         encountersList[0].resultsEncounterId
           ? `/openmrs/module/htmlformentry/htmlFormEntry.form?encounterId=${encountersList[0].resultsEncounterId}&mode=VIEW`
-          : `/openmrs/module/htmlformentry/htmlFormEntry.form?personId=${encountersList[0].personId}&patientId=${encountersList[0].personId}&returnUrl=&formId=${config.pathologyResultsFromID}&uuid=${encountersList[0].encounterUuid}`,
+          : `/openmrs/module/htmlformentry/htmlFormEntry.form?personId=${encountersList[0].personId}&patientId=${encountersList[0].personId}&returnUrl=&formId=${configSchema.pathologyResultsFromID._default}&uuid=${encountersList[0].encounterUuid}`,
       );
     });
   });
