@@ -11,7 +11,6 @@ import DataTable, {
 } from "carbon-components-react/es/components/DataTable";
 
 import styles from "./ReportComponent.css";
-// import { TableRow } from './TableRow';
 import {
   getUserLocation,
   getConceptAnswers,
@@ -94,57 +93,33 @@ const ReportComponent = () => {
     .filter(
       (encList) =>
         !sampleStatus ||
-        (encList.sampleStatusObs &&
-          encList.sampleStatusObs.toLowerCase() == sampleStatus.toLowerCase())
+        encList.sampleStatusObs?.toLowerCase() == sampleStatus.toLowerCase()
     )
     .filter(
       (encList) =>
         !referralStatus ||
-        (encList.referralStatusObs &&
-          encList.referralStatusObs.toLowerCase() ==
-            referralStatus.toLowerCase())
+        encList.referralStatusObs?.toLowerCase() == referralStatus.toLowerCase()
     )
     .filter(
       (encList) =>
         !sendingHospital ||
-        (encList.patientHealthCenter &&
-          encList.patientHealthCenter.toLowerCase() ==
-            sendingHospital.toLowerCase())
+        encList.patientHealthCenter?.toLowerCase() ==
+          sendingHospital.toLowerCase()
     )
-    .filter(
-      (encList) =>
-        // !patientName || (encList.family_name && encList.family_name.toLowerCase().includes(patientName.toLowerCase())) ||
-        //   (encList.family_name2 && encList.family_name2.toLowerCase().includes(patientName.toLowerCase())) ||
-        //   (encList.middle_name && encList.middle_name.toLowerCase().includes(patientName.toLowerCase())) ||
-        //   (encList.given_name && encList.given_name.toLowerCase().includes(patientName.toLowerCase())),
-        !patientName ||
-        (encList.family_name + encList.middle_name + encList.given_name &&
-          (encList.family_name + encList.middle_name + encList.given_name)
-            .toLowerCase()
-            .includes(patientName.replace(/\s+/g, "").toLowerCase())) ||
-        (encList.family_name + encList.given_name + encList.middle_name &&
-          (encList.family_name + encList.given_name + encList.middle_name)
-            .toLowerCase()
-            .includes(patientName.replace(/\s+/g, "").toLowerCase())) ||
-        (encList.middle_name + encList.family_name + encList.given_name &&
-          (encList.middle_name + encList.family_name + encList.given_name)
-            .toLowerCase()
-            .includes(patientName.replace(/\s+/g, "").toLowerCase())) ||
-        (encList.middle_name + encList.given_name + encList.family_name &&
-          (encList.middle_name + encList.given_name + encList.family_name)
-            .toLowerCase()
-            .includes(patientName.replace(/\s+/g, "").toLowerCase())) ||
-        (encList.given_name + encList.family_name + encList.middle_name &&
-          (encList.given_name + encList.family_name + encList.middle_name)
-            .toLowerCase()
-            .includes(patientName.replace(/\s+/g, "").toLowerCase())) ||
-        (encList.given_name + encList.middle_name + encList.family_name &&
-          (encList.given_name + encList.middle_name + encList.family_name)
-            .toLowerCase()
-            .includes(patientName.replace(/\s+/g, "").toLowerCase()))
-
-      // (encList.given_name && (encList.given_name+encList.family_name+encList.given_name).toLowerCase().includes(patientName.toLowerCase())),
-    );
+    .filter((encList) => {
+      if (!patientName) {
+        return true;
+      } else {
+        // Given a patient name filter input, break it up into tokens.
+        // Filter to patients for which each token matches.
+        // Matching is case-insensitive and matches the beginning of each name.
+        const nameTokens = patientName.split(/\s+/);
+        const name = `${encList.family_name} ${encList.middle_name} ${encList.given_name}`;
+        return nameTokens.every((token) =>
+          new RegExp("\\b" + token, "i").test(name)
+        );
+      }
+    });
   //replace(/\s+/g, '');
   // const rows = filteredEncList.map(
   //   (encounterInfo) => {
