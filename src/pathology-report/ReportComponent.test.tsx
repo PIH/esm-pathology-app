@@ -1,11 +1,6 @@
 import React from "react";
-import {
-  render,
-  screen,
-  within,
-  waitFor,
-} from "@testing-library/react";
-import userEvent from '@testing-library/user-event'
+import { render, screen, within, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import {
   getUserLocation,
   getConceptAnswers,
@@ -220,7 +215,9 @@ describe("pathology request list", () => {
     const textBox = screen.getByLabelText("Patient Name");
     userEvent.type(textBox, "NKOMEJE");
     expect(screen.queryByText("REBERO Emille")).not.toBeInTheDocument();
-    expect(screen.queryByText("MUKAMUSONERA Jacqueline")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("MUKAMUSONERA Jacqueline")
+    ).not.toBeInTheDocument();
     expect(screen.queryByText("NKOMEJE Evariste")).toBeInTheDocument();
   });
 
