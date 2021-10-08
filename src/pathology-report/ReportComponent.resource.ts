@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch } from "@openmrs/esm-framework";
 
 export interface EncounterResult {
   family_name: string;
@@ -65,13 +65,19 @@ export interface Obs {
 export async function getUserLocation(healthCenterAttrTypeUUID) {
   const session = await openmrsFetch(`/ws/rest/v1/session`);
   const personUuid = session.data.user.person.uuid;
-  const person = await openmrsFetch(`/ws/rest/v1/person/${personUuid}/attribute`);
-  const hcPersonAttribute = person.data.results.filter((attr) => attr.attributeType.uuid === healthCenterAttrTypeUUID);
+  const person = await openmrsFetch(
+    `/ws/rest/v1/person/${personUuid}/attribute`
+  );
+  const hcPersonAttribute = person.data.results.filter(
+    (attr) => attr.attributeType.uuid === healthCenterAttrTypeUUID
+  );
   return hcPersonAttribute[0] ? hcPersonAttribute[0].value.uuid : null;
 }
 
 export async function getConceptAnswers(conceptUuid) {
-  const concept = await openmrsFetch(`/ws/rest/v1/concept/${conceptUuid}?v=full`);
+  const concept = await openmrsFetch(
+    `/ws/rest/v1/concept/${conceptUuid}?v=full`
+  );
   return concept.data.answers;
 }
 
@@ -88,17 +94,22 @@ export async function getLocations() {
 
 export async function getEncounters(
   healthCenterAttrTypeUUID,
-  pathologyFullAllowedLocationName,
+  pathologyFullAllowedLocationName
 ): Promise<Array<EncounterResult>> {
   const userLocationUUID = await getUserLocation(healthCenterAttrTypeUUID);
 
   let searchEncounter = null;
-  if (userLocationUUID && userLocationUUID != pathologyFullAllowedLocationName) {
+  if (
+    userLocationUUID &&
+    userLocationUUID != pathologyFullAllowedLocationName
+  ) {
     searchEncounter = await openmrsFetch(
-      `/ws/rest/v1/reportingrest/reportdata/996cf192-ff54-11eb-a63a-080027ce9ca0?location=${userLocationUUID}`,
+      `/ws/rest/v1/reportingrest/reportdata/996cf192-ff54-11eb-a63a-080027ce9ca0?location=${userLocationUUID}`
     );
   } else {
-    searchEncounter = await openmrsFetch(`/ws/rest/v1/reportingrest/reportdata/996cf192-ff54-11eb-a63a-080027ce9ca0`);
+    searchEncounter = await openmrsFetch(
+      `/ws/rest/v1/reportingrest/reportdata/996cf192-ff54-11eb-a63a-080027ce9ca0`
+    );
   }
   return searchEncounter.data.dataSets[0].rows;
 }
@@ -107,7 +118,7 @@ export async function postSampleDropoffObs(
   obsObject: Obs,
   sampleDropOffconceptUUID,
   healthCenterAttrTypeUUID,
-  yesConceptName,
+  yesConceptName
 ) {
   const ObsObjectTocreate = {
     person: obsObject.patientUuid,
@@ -119,10 +130,10 @@ export async function postSampleDropoffObs(
     voided: false,
   };
 
-  const response = await openmrsFetch('/ws/rest/v1/obs', {
-    method: 'POST',
+  const response = await openmrsFetch("/ws/rest/v1/obs", {
+    method: "POST",
     headers: {
-      'content-type': 'application/json',
+      "content-type": "application/json",
     },
     body: ObsObjectTocreate,
   });
@@ -134,13 +145,16 @@ export async function voidSampleDropoff(sampleDropoffObsUuid: string) {
     voided: true,
   };
 
-  const response = await openmrsFetch(`/ws/rest/v1/obs/${sampleDropoffObsUuid}`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: ObsObjectTocreate,
-  });
+  const response = await openmrsFetch(
+    `/ws/rest/v1/obs/${sampleDropoffObsUuid}`,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: ObsObjectTocreate,
+    }
+  );
 
   return response;
 }
@@ -149,7 +163,7 @@ export async function postSampleStatusChangeObs(
   AnsUuid,
   obsObject: Obs,
   sampleStatusConceptUUID,
-  healthCenterAttrTypeUUID,
+  healthCenterAttrTypeUUID
 ) {
   const ObsObjectTocreate = {
     person: obsObject.patientUuid,
@@ -161,10 +175,10 @@ export async function postSampleStatusChangeObs(
     voided: false,
   };
 
-  const response = await openmrsFetch('/ws/rest/v1/obs', {
-    method: 'POST',
+  const response = await openmrsFetch("/ws/rest/v1/obs", {
+    method: "POST",
     headers: {
-      'content-type': 'application/json',
+      "content-type": "application/json",
     },
     body: ObsObjectTocreate,
   });
@@ -176,7 +190,7 @@ export async function updateSampleStatusChangeObs(
   targetValue,
   obsObject: Obs,
   sampleStatusConceptUUID,
-  healthCenterAttrTypeUUID,
+  healthCenterAttrTypeUUID
 ) {
   const ObsObjectTocreate = {
     person: obsObject.patientUuid,
@@ -188,13 +202,16 @@ export async function updateSampleStatusChangeObs(
     voided: targetValue ? false : true,
   };
 
-  const response = await openmrsFetch(`/ws/rest/v1/obs/${obsObject.sampleStatusObsUuid}`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: ObsObjectTocreate,
-  });
+  const response = await openmrsFetch(
+    `/ws/rest/v1/obs/${obsObject.sampleStatusObsUuid}`,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: ObsObjectTocreate,
+    }
+  );
 
   return response;
 }
@@ -203,7 +220,7 @@ export async function postReferralStatusChangeObs(
   targetValue,
   obsObject: Obs,
   referralStatusConceptUUID,
-  healthCenterAttrTypeUUID,
+  healthCenterAttrTypeUUID
 ) {
   const ObsObjectTocreate = {
     person: obsObject.patientUuid,
@@ -215,10 +232,10 @@ export async function postReferralStatusChangeObs(
     voided: false,
   };
 
-  const response = await openmrsFetch('/ws/rest/v1/obs', {
-    method: 'POST',
+  const response = await openmrsFetch("/ws/rest/v1/obs", {
+    method: "POST",
     headers: {
-      'content-type': 'application/json',
+      "content-type": "application/json",
     },
     body: ObsObjectTocreate,
   });
@@ -230,7 +247,7 @@ export async function updateReferralStatusChangeObs(
   targetValue,
   obsObject: Obs,
   referralStatusConceptUUID,
-  healthCenterAttrTypeUUID,
+  healthCenterAttrTypeUUID
 ) {
   const ObsObjectTocreate = {
     person: obsObject.patientUuid,
@@ -242,13 +259,16 @@ export async function updateReferralStatusChangeObs(
     voided: targetValue ? false : true,
   };
 
-  const response = await openmrsFetch(`/ws/rest/v1/obs/${obsObject.referralStatusObsUuid}`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: ObsObjectTocreate,
-  });
+  const response = await openmrsFetch(
+    `/ws/rest/v1/obs/${obsObject.referralStatusObsUuid}`,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: ObsObjectTocreate,
+    }
+  );
 
   return response;
 }

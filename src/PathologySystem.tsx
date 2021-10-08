@@ -1,6 +1,6 @@
-import React from 'react';
-import styles from './pathology.css';
-import ReportComponent from './pathology-report/ReportComponent';
+import React from "react";
+import styles from "./pathology.css";
+import ReportComponent from "./pathology-report/ReportComponent";
 
 const PathologySystem = () => {
   return (
