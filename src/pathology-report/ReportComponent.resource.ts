@@ -7,13 +7,14 @@ export interface EncounterResult {
   patientPhoneNumber: { value: string };
   patientHealthCenter: string;
   patientUuid: string;
-  uuid: string;
+  encounterUuid: string;
   encounterId: number;
   personId: number;
   encounterDatetime: Date;
-  sampleStatusObs: { value: { display: string } };
-  referralStatusObs: { value: { display: string } };
-  sampleDropoffObs: { value: { display: string } };
+  sampleStatusObs: string;
+  referralStatusObs: string;
+  sampleDropoffObs: string;
+  resultsEncounterId: string;
 }
 export interface Patient {
   uuid: string;
