@@ -237,7 +237,8 @@ const ReportComponent = () => {
           Results{" "}
         </a>
       ) : (
-        !userLocation && (
+        (!userLocation ||
+          userLocation === config.pathologyFullAllowedLocationUUID) && (
           <a
             href={`/openmrs/module/htmlformentry/htmlFormEntry.form?personId=${encounterInfo.personId}&patientId=${encounterInfo.personId}&returnUrl=&formId=${config.pathologyResultsFromID}&uuid=${encounterInfo.encounterUuid}`}
           >
