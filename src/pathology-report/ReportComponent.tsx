@@ -9,6 +9,7 @@ import DataTable, {
   TableBody,
   TableCell,
 } from "carbon-components-react/es/components/DataTable";
+import { PDFViewer } from "@react-pdf/renderer";
 
 import styles from "./ReportComponent.css";
 import {
@@ -23,8 +24,11 @@ import {
   postReferralStatusChangeObs,
   updateReferralStatusChangeObs,
   EncounterResult,
+  postApproval,
+  getUser,
   Concept,
 } from "./ReportComponent.resource";
+import MyDocument from "../Print-to-PDF/Document-Component";
 import { Config } from "../config-schema";
 
 const ReportComponent = () => {
@@ -80,6 +84,10 @@ const ReportComponent = () => {
     {
       key: "resultsEncounter",
       header: "Results",
+    },
+    {
+      key: "approvedBy",
+      header: "Signed",
     },
   ];
 
@@ -247,6 +255,21 @@ const ReportComponent = () => {
           </a>
         )
       ),
+      approvedBy:
+        encounterInfo.resultsEncounterId &&
+        (encounterInfo.approvedBy ? (
+          encounterInfo.approvedBy
+        ) : !userLocation ||
+          userLocation === config.pathologyFullAllowedLocationUUID ? (
+          <input
+            data-testid="approvedBy"
+            type="checkbox"
+            checked={Boolean(encounterInfo.approvedBy)}
+            onChange={(e) => approveChange(encounterInfo)}
+          />
+        ) : (
+          "Wait for approval"
+        )),
     };
   });
 
@@ -278,6 +301,30 @@ const ReportComponent = () => {
           tempEncList[encIndex].sampleDropoffObsUuid = "";
 
           setEncountersList(tempEncList);
+        }
+      });
+    }
+  };
+
+  const approveChange = (encounterInfo) => {
+    // Add pathologist approve obs to results.
+    const tempEncList = cloneDeep(encountersList);
+    if (!encounterInfo.approvedBy) {
+      postApproval(
+        encounterInfo,
+        config.pathologyResultsApprovedconceptUUID,
+        config.healthCenterAttrTypeUUID,
+        config.yesConceptUUID
+      ).then((response) => {
+        if (response.ok) {
+          const encIndex = tempEncList.findIndex(
+            (enc) => enc.encounterUuid == encounterInfo.encounterUuid
+          );
+          getUser(response.data.auditInfo.creator.uuid).then((response) => {
+            // setUserNames(response.person.display)
+            tempEncList[encIndex].approvedBy = response.person.display;
+            setEncountersList(tempEncList);
+          });
         }
       });
     }
@@ -462,6 +509,9 @@ const ReportComponent = () => {
           )}
         </DataTable>
       </div>
+      <PDFViewer>
+        <MyDocument />
+      </PDFViewer>
     </div>
   );
 };

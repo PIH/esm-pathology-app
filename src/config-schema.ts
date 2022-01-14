@@ -17,7 +17,7 @@ import { Type, validator } from "@openmrs/esm-framework";
 export const configSchema = {
   pathologyEncTypeUUID: {
     _type: Type.String,
-    _default: "4d911f5c-26fe-102b-80cb-0017a47871b2",
+    _default: "70f18a24-92ec-4de5-acdc-7cae77414e32",
     _description:
       "This is to determine the UUID of the Pathology encounterType in the instance",
   },
@@ -29,25 +29,25 @@ export const configSchema = {
   },
   pathologyFullAllowedLocationUUID: {
     _type: Type.String,
-    _default: "38c4b94b-97a6-4f2c-bca6-c28a37cf60ed",
+    _default: "a62fd59a-6577-43e0-b39c-ba42ac8cfbc9",
     _description:
       "This is to determine the location allowed to view all other location data",
   },
   sampleStatusConceptUUID: {
     _type: Type.String,
-    _default: "3ce163d8-26fe-102b-80cb-0017a47871b2",
+    _default: "3adca58e-9334-4be5-9bd3-74f7bbf82776",
     _description:
       "This is to determine the UUID of the sample status concept in the instance",
   },
   referralStatusConceptUUID: {
     _type: Type.String,
-    _default: "3cd93302-26fe-102b-80cb-0017a47871b2",
+    _default: "5a7a931f-97b8-4d59-b0de-3a83603aaad9",
     _description:
       "This is to determine the UUID of the referral status concept in the instance",
   },
   sampleDropOffconceptUUID: {
     _type: Type.String,
-    _default: "13662f27-9be5-4595-8bab-07b0e859d9f4",
+    _default: "dc288e6c-84a4-4fd3-9136-ef9e13961b1e",
     _description:
       "This is to determine the UUID of the sample drop off concept in the instance",
   },
@@ -66,9 +66,15 @@ export const configSchema = {
 
   pathologyResultsFromID: {
     _type: Type.Number,
-    _default: 131,
+    _default: 5613,
     _description:
       "This is to determine the ID of the pathology results form in the instance",
+  },
+  pathologyResultsApprovedconceptUUID: {
+    _type: Type.String,
+    _default: "1f7742f0-4571-44d8-a88b-8bc60dc11e29",
+    _description:
+      "This is to determine the pathology results approved concept uuid",
   },
 };
 
@@ -82,4 +88,5 @@ export type Config = {
   yesConceptUUID: string;
   yesConceptName: string;
   pathologyResultsFromID: number;
+  pathologyResultsApprovedconceptUUID: string;
 };

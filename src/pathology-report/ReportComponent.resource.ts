@@ -15,6 +15,7 @@ export interface EncounterResult {
   referralStatusObs: string;
   sampleDropoffObs: string;
   resultsEncounterId: string;
+  approvedBy: string;
 }
 export interface Patient {
   uuid: string;
@@ -34,6 +35,7 @@ export interface Obs {
   encounterUuid: string;
   valueCodedName: string;
   voided: boolean;
+  resultsEncounterUuid: string;
 }
 
 // export async function getPatientEncounters(patientUuid): Promise<Array<EncounterResult>> {
@@ -73,7 +75,7 @@ export async function getUserLocation(healthCenterAttrTypeUUID) {
   const hcPersonAttribute = person.data.results.filter(
     (attr) => attr.attributeType.uuid === healthCenterAttrTypeUUID
   );
-  return hcPersonAttribute[0]?.value.uuid;
+  return hcPersonAttribute[0] && hcPersonAttribute.value.uuid;
 }
 
 export async function getConceptAnswers(conceptUuid) {
@@ -273,4 +275,36 @@ export async function updateReferralStatusChangeObs(
   );
 
   return response;
+}
+
+export async function postApproval(
+  obsObject: Obs,
+  pathologyResultsApprovedconceptUUID: string,
+  healthCenterAttrTypeUUID: string,
+  yesConceptUUID: string
+) {
+  const ObsObjectTocreate = {
+    person: obsObject.patientUuid,
+    obsDatetime: new Date().toISOString(),
+    concept: pathologyResultsApprovedconceptUUID,
+    location: await getUserLocation(healthCenterAttrTypeUUID),
+    encounter: obsObject.resultsEncounterUuid,
+    value: yesConceptUUID,
+    voided: false,
+  };
+
+  const response = await openmrsFetch("/ws/rest/v1/obs?v=full", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: ObsObjectTocreate,
+  });
+  return response;
+}
+
+export async function getUser(userUuid: string) {
+  const user = await openmrsFetch(`/ws/rest/v1/user/${userUuid}`);
+
+  return user.data;
 }
