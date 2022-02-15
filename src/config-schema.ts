@@ -76,6 +76,84 @@ export const configSchema = {
     _description:
       "This is to determine the pathology results approved concept uuid",
   },
+  AccessionNumberconceptUUID: {
+    _type: Type.String,
+    _default: "0e466f59-8070-45b5-97d1-575ec5cfd85d",
+    _description:
+      "This is to determine the Accession Number concept uuid",
+  },
+  DateBiopsySpecimenTakenconceptUUID: {
+    _type: Type.String,
+    _default: "e0436a5b-dc19-4cb9-ac1b-acc005272c08",
+    _description:
+      "This is to determine the Date Biopsy Specimen Taken concept uuid",
+  },
+  SpecimenSubmissionDateconceptUUID: {
+    _type: Type.String,
+    _default: "3928b7fc-b3ae-40a5-846f-d480120b04f6",
+    _description:
+      "This is to determine the Specimen Submission Date concept uuid",
+  },
+  SendingPhysicianconceptUUID: {
+    _type: Type.String,
+    _default: "0a4a22db-0e82-4669-9aba-086d841505b5",
+    _description:
+      "This is to determine the Sending Physician concept uuid",
+  },
+  OtherBiopsyLocationconceptUUID: {
+    _type: Type.String,
+    _default: "7c4650ee-45d5-435a-b968-511ef127a016",
+    _description:
+      "This is to determine the Other Biopsy Location concept uuid",
+  },
+  OrganSystemconceptUUID: {
+    _type: Type.String,
+    _default: "b88f9524-6b39-41b3-9b3a-f9a7a4b08fed",
+    _description:
+      "This is to determine the Organ System concept uuid",
+  },
+  OrganconceptUUID: {
+    _type: Type.String,
+    _default: "488fe4a2-7903-41da-b21e-fb236a1ee356",
+    _description:
+      "This is to determine the Organ concept uuid",
+  },
+  SpecimenDetailconceptUUID: {
+    _type: Type.String,
+    _default: "e99170a5-f46b-490b-8fbb-bb9eacba3500",
+    _description:
+      "This is to determine the Specimen Detail concept uuid",
+  },
+  OtherTestsOrProceduresconceptUUID: {
+    _type: Type.String,
+    _default: "66ad3230-59b2-4232-821e-a9ae86819e03",
+    _description:
+      "This is to determine the Other tests or procedures concept uuid",
+  },
+  GrossDescriptionconceptUUID: {
+    _type: Type.String,
+    _default: "1e97a4d3-1691-4fb7-be78-18e526e82b0b",
+    _description:
+      "This is to determine the Gross Description concept uuid",
+  },
+  MacroscopicExaminationconceptUUID: {
+    _type: Type.String,
+    _default: "5d149510-0767-4da7-82cd-be406b34877d",
+    _description:
+      "This is to determine the Macroscopic Examination concept uuid",
+  },
+  COMMENTSATCONCLUSIONOFEXAMINATIONconceptUUID: {
+    _type: Type.String,
+    _default: "3cdc5938-26fe-102b-80cb-0017a47871b2",
+    _description:
+      "This is to determine the COMMENTS AT CONCLUSION OF EXAMINATION concept uuid",
+  },
+  CanregCodeconceptUUID: {
+    _type: Type.String,
+    _default: "16931672-e068-4ea8-a89c-2ee7dbc07ad1",
+    _description:
+      "This is to determine the Canreg Code concept uuid",
+  },
 };
 
 export type Config = {
@@ -89,4 +167,18 @@ export type Config = {
   yesConceptName: string;
   pathologyResultsFromID: number;
   pathologyResultsApprovedconceptUUID: string;
+
+  AccessionNumberconceptUUID: string;
+  DateBiopsySpecimenTakenconceptUUID: string;
+  SpecimenSubmissionDateconceptUUID: string;
+  SendingPhysicianconceptUUID: string;
+  OtherBiopsyLocationconceptUUID: string;
+  OrganSystemconceptUUID: string;
+  OrganconceptUUID: string;
+  SpecimenDetailconceptUUID: string;
+  OtherTestsOrProceduresconceptUUID: string;
+  GrossDescriptionconceptUUID: string;
+  MacroscopicExaminationconceptUUID: string;
+  COMMENTSATCONCLUSIONOFEXAMINATIONconceptUUID: string;
+  CanregCodeconceptUUID: string;
 };

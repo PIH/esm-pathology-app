@@ -9,7 +9,7 @@ import DataTable, {
   TableBody,
   TableCell,
 } from "carbon-components-react/es/components/DataTable";
-import { PDFViewer } from "@react-pdf/renderer";
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 
 import styles from "./ReportComponent.css";
 import {
@@ -25,8 +25,10 @@ import {
   updateReferralStatusChangeObs,
   EncounterResult,
   postApproval,
+  voidApprovalObs,
   getUser,
   Concept,
+  getEncounter,
 } from "./ReportComponent.resource";
 import MyDocument from "../Print-to-PDF/Document-Component";
 import { Config } from "../config-schema";
@@ -87,7 +89,7 @@ const ReportComponent = () => {
     },
     {
       key: "approvedBy",
-      header: "Signed",
+      header: "validation",
     },
   ];
 
@@ -103,7 +105,9 @@ const ReportComponent = () => {
     getEncounters(
       config.healthCenterAttrTypeUUID,
       config.pathologyFullAllowedLocationUUID
-    ).then(setEncountersList);
+    ).then(
+      setEncountersList
+      );
   }, []);
 
   const filteredEncList = encountersList
@@ -200,7 +204,8 @@ const ReportComponent = () => {
           ))}
         </select>
       ),
-      dateOfRequest: encounterInfo.encounterDatetime,
+      dateOfRequest: new Date(encounterInfo.encounterDatetime)
+                .toLocaleString(["en-GB","en-US","en","fr-RW"],{day: 'numeric',month: 'numeric',year: 'numeric'}),
       referralStatus: (
         <select
           onChange={(e) =>
@@ -257,19 +262,39 @@ const ReportComponent = () => {
       ),
       approvedBy:
         encounterInfo.resultsEncounterId &&
-        (encounterInfo.approvedBy ? (
-          encounterInfo.approvedBy
-        ) : !userLocation ||
-          userLocation === config.pathologyFullAllowedLocationUUID ? (
-          <input
-            data-testid="approvedBy"
-            type="checkbox"
-            checked={Boolean(encounterInfo.approvedBy)}
-            onChange={(e) => approveChange(encounterInfo)}
-          />
-        ) : (
-          "Wait for approval"
-        )),
+        ( 
+          <table >
+            {
+              (!userLocation ||
+                userLocation === config.pathologyFullAllowedLocationUUID) && 
+                  <tr >
+                    <td>
+                      
+                          <input
+                            data-testid="approvedBy"
+                            type="checkbox"
+                            checked={Boolean(encounterInfo.approvedBy)}
+                            onChange={(e) => approveChange(encounterInfo)}
+                          />
+
+                      
+                    </td>
+                  </tr>
+            }
+            {
+              encounterInfo.approvedBy &&
+                <tr>
+                  <td>
+                  
+                      <PDFDownloadLink document={<MyDocument encounterInfo={encounterInfo} config={config} />} fileName="Pathology Report">
+                        {({loading}) => (loading ? 'loading...' : <button>Download</button>)}
+                      </PDFDownloadLink>
+                  </td>
+                </tr>
+            }
+          </table>
+        )
+        
     };
   });
 
@@ -315,16 +340,30 @@ const ReportComponent = () => {
         config.pathologyResultsApprovedconceptUUID,
         config.healthCenterAttrTypeUUID,
         config.yesConceptUUID
-      ).then((response) => {
-        if (response.ok) {
+      ).then((obsResponse) => {
+        if (obsResponse.ok) {
           const encIndex = tempEncList.findIndex(
             (enc) => enc.encounterUuid == encounterInfo.encounterUuid
           );
-          getUser(response.data.auditInfo.creator.uuid).then((response) => {
-            // setUserNames(response.person.display)
-            tempEncList[encIndex].approvedBy = response.person.display;
+          getUser(obsResponse.data.auditInfo.creator.uuid).then((response) => {
+            console.log("approval response = " + JSON.stringify( obsResponse));
+            tempEncList[encIndex].approvedBy = response.person.display + " On: " + 
+              new Date().toLocaleString(["en-GB","en-US","en","fr-RW"],{day: 'numeric',month: 'numeric',year: 'numeric'});
+            tempEncList[encIndex].approvalObsUuid = obsResponse.data.uuid;
             setEncountersList(tempEncList);
           });
+        }
+      });
+    }
+    else if(encounterInfo.approvalObsUuid){
+      voidApprovalObs(encounterInfo.approvalObsUuid).then((obsVoidingResponse)=>{
+        if(obsVoidingResponse.ok) {
+          const encIndex = tempEncList.findIndex(
+            (enc) => enc.encounterUuid == encounterInfo.encounterUuid
+          );
+          tempEncList[encIndex].approvedBy = "";
+          tempEncList[encIndex].approvalObsUuid ="";
+          setEncountersList(tempEncList);
         }
       });
     }
@@ -419,6 +458,7 @@ const ReportComponent = () => {
       });
     }
   };
+  
 
   return (
     <div>
@@ -483,6 +523,7 @@ const ReportComponent = () => {
           onChange={(e) => setPatientName(e.target.value)}
         />
       </div>
+      {console.log( encountersList)}
       <div className={styles.tableContainer}>
         <DataTable rows={rows} headers={headers}>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
@@ -509,9 +550,15 @@ const ReportComponent = () => {
           )}
         </DataTable>
       </div>
-      <PDFViewer>
-        <MyDocument />
-      </PDFViewer>
+      <div>
+        {/* <PDFViewer>
+          <MyDocument />
+        </PDFViewer> */}
+        {/* <PDFDownloadLink document={<MyDocument />} fileName="Pathology Report">
+          {({loading}) => (loading ? 'loading...' : <button>Download</button>)}
+        </PDFDownloadLink> */}
+        
+      </div>
     </div>
   );
 };

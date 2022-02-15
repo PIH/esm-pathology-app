@@ -1,4 +1,6 @@
 import { openmrsFetch } from "@openmrs/esm-framework";
+import cloneDeep from "lodash-es/cloneDeep";
+
 
 export interface EncounterResult {
   family_name: string;
@@ -15,7 +17,10 @@ export interface EncounterResult {
   referralStatusObs: string;
   sampleDropoffObs: string;
   resultsEncounterId: string;
+  resultsEncounterUuid: string;
+  resultsEncounter: [];
   approvedBy: string;
+  approvalObsUuid: string;
 }
 export interface Patient {
   uuid: string;
@@ -25,6 +30,9 @@ export interface Concept {
   name: string;
   display: string;
 }
+// export interface Encounter {
+
+// }
 export interface Obs {
   patientUuid: string;
   obsDateTime: string;
@@ -115,7 +123,21 @@ export async function getEncounters(
       `/ws/rest/v1/reportingrest/reportdata/996cf192-ff54-11eb-a63a-080027ce9ca0`
     );
   }
-  return searchEncounter.data.dataSets[0].rows;
+// return searchEncounter.data.dataSets[0].rows;
+  // let EncListClone = searchEncounter;
+  const EncListClone = searchEncounter.data.dataSets[0].rows.map(async (encObject)=>{
+    if(encObject.resultsEncounterUuid){
+      const encIndex = searchEncounter.data.dataSets[0].rows.findIndex(
+         (enc) => enc.encounterUuid == encObject.encounterUuid
+      );
+      const resultsEnc =await getEncounter(encObject.resultsEncounterUuid);
+      encObject.resultsEncounter = resultsEnc;
+      
+    }
+    return encObject; 
+  });
+  
+  return Promise.all(EncListClone);
 }
 
 export async function postSampleDropoffObs(
@@ -302,9 +324,33 @@ export async function postApproval(
   });
   return response;
 }
+export async function voidApprovalObs(approvalObsUuid: string) {
+  const ObsObjectTocreate = {
+    voided: true,
+  };
+
+  const response = await openmrsFetch(
+    `/ws/rest/v1/obs/${approvalObsUuid}`,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: ObsObjectTocreate,
+    }
+  );
+  console.log("voidedddddddddddddd");
+
+  return response;
+}
 
 export async function getUser(userUuid: string) {
   const user = await openmrsFetch(`/ws/rest/v1/user/${userUuid}`);
 
   return user.data;
+}
+export async function getEncounter(encounterUuid) {
+  const encResult = await openmrsFetch(`/ws/rest/v1/encounter/${encounterUuid}?v=full`);
+  
+  return encResult.data;
 }
