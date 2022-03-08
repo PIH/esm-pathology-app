@@ -24,8 +24,8 @@ import {
   postReferralStatusChangeObs,
   updateReferralStatusChangeObs,
   EncounterResult,
-  postApproval,
-  voidApprovalObs,
+  // postApproval,
+  // voidApprovalObs,
   getUser,
   Concept,
   getEncounter,
@@ -88,8 +88,8 @@ const ReportComponent = () => {
       header: "Results",
     },
     {
-      key: "approvedBy",
-      header: "validation",
+      key: "PDFReport",
+      header: "Report",
     },
   ];
 
@@ -260,39 +260,16 @@ const ReportComponent = () => {
           </a>
         )
       ),
-      approvedBy:
+      PDFReport:
         encounterInfo.resultsEncounterId &&
-        ( 
-          <table >
-            {
-              (!userLocation ||
-                userLocation === config.pathologyFullAllowedLocationUUID) && 
-                  <tr >
-                    <td>
-                      
-                          <input
-                            data-testid="approvedBy"
-                            type="checkbox"
-                            checked={Boolean(encounterInfo.approvedBy)}
-                            onChange={(e) => approveChange(encounterInfo)}
-                          />
-
-                      
-                    </td>
-                  </tr>
-            }
-            {
-              encounterInfo.approvedBy &&
-                <tr>
-                  <td>
-                  
-                      <PDFDownloadLink document={<MyDocument encounterInfo={encounterInfo} config={config} />} fileName="Pathology Report">
-                        {({loading}) => (loading ? 'loading...' : <button>Download</button>)}
-                      </PDFDownloadLink>
-                  </td>
-                </tr>
-            }
-          </table>
+        (
+          encounterInfo.approvedBy &&
+            <PDFDownloadLink document={<MyDocument encounterInfo={encounterInfo} config={config} />} fileName="Pathology Report">
+              {({loading}) => (loading ? 'loading...' : <button>Download</button>)}
+            </PDFDownloadLink>
+            
+              
+           
         )
         
     };
@@ -331,43 +308,43 @@ const ReportComponent = () => {
     }
   };
 
-  const approveChange = (encounterInfo) => {
-    // Add pathologist approve obs to results.
-    const tempEncList = cloneDeep(encountersList);
-    if (!encounterInfo.approvedBy) {
-      postApproval(
-        encounterInfo,
-        config.pathologyResultsApprovedconceptUUID,
-        config.healthCenterAttrTypeUUID,
-        config.yesConceptUUID
-      ).then((obsResponse) => {
-        if (obsResponse.ok) {
-          const encIndex = tempEncList.findIndex(
-            (enc) => enc.encounterUuid == encounterInfo.encounterUuid
-          );
-          getUser(obsResponse.data.auditInfo.creator.uuid).then((response) => {
-            console.log("approval response = " + JSON.stringify( obsResponse));
-            tempEncList[encIndex].approvedBy = response.person.display + " On: " + 
-              new Date().toLocaleString(["en-GB","en-US","en","fr-RW"],{day: 'numeric',month: 'numeric',year: 'numeric'});
-            tempEncList[encIndex].approvalObsUuid = obsResponse.data.uuid;
-            setEncountersList(tempEncList);
-          });
-        }
-      });
-    }
-    else if(encounterInfo.approvalObsUuid){
-      voidApprovalObs(encounterInfo.approvalObsUuid).then((obsVoidingResponse)=>{
-        if(obsVoidingResponse.ok) {
-          const encIndex = tempEncList.findIndex(
-            (enc) => enc.encounterUuid == encounterInfo.encounterUuid
-          );
-          tempEncList[encIndex].approvedBy = "";
-          tempEncList[encIndex].approvalObsUuid ="";
-          setEncountersList(tempEncList);
-        }
-      });
-    }
-  };
+  // const approveChange = (encounterInfo) => {
+  //   // Add pathologist approve obs to results.
+  //   const tempEncList = cloneDeep(encountersList);
+  //   if (!encounterInfo.approvedBy) {
+  //     postApproval(
+  //       encounterInfo,
+  //       config.pathologyResultsApprovedconceptUUID,
+  //       config.healthCenterAttrTypeUUID,
+  //       config.yesConceptUUID
+  //     ).then((obsResponse) => {
+  //       if (obsResponse.ok) {
+  //         const encIndex = tempEncList.findIndex(
+  //           (enc) => enc.encounterUuid == encounterInfo.encounterUuid
+  //         );
+  //         getUser(obsResponse.data.auditInfo.creator.uuid).then((response) => {
+  //           console.log("approval response = " + JSON.stringify( obsResponse));
+  //           tempEncList[encIndex].approvedBy = response.person.display + " On: " + 
+  //             new Date().toLocaleString(["en-GB","en-US","en","fr-RW"],{day: 'numeric',month: 'numeric',year: 'numeric'});
+  //           tempEncList[encIndex].approvalObsUuid = obsResponse.data.uuid;
+  //           setEncountersList(tempEncList);
+  //         });
+  //       }
+  //     });
+  //   }
+  //   else if(encounterInfo.approvalObsUuid){
+  //     voidApprovalObs(encounterInfo.approvalObsUuid).then((obsVoidingResponse)=>{
+  //       if(obsVoidingResponse.ok) {
+  //         const encIndex = tempEncList.findIndex(
+  //           (enc) => enc.encounterUuid == encounterInfo.encounterUuid
+  //         );
+  //         tempEncList[encIndex].approvedBy = "";
+  //         tempEncList[encIndex].approvalObsUuid ="";
+  //         setEncountersList(tempEncList);
+  //       }
+  //     });
+  //   }
+  // };
 
   const sampleStatusChange = (
     newStatus: { uuid: string; display: string },

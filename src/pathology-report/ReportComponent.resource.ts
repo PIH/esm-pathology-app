@@ -299,50 +299,50 @@ export async function updateReferralStatusChangeObs(
   return response;
 }
 
-export async function postApproval(
-  obsObject: Obs,
-  pathologyResultsApprovedconceptUUID: string,
-  healthCenterAttrTypeUUID: string,
-  yesConceptUUID: string
-) {
-  const ObsObjectTocreate = {
-    person: obsObject.patientUuid,
-    obsDatetime: new Date().toISOString(),
-    concept: pathologyResultsApprovedconceptUUID,
-    location: await getUserLocation(healthCenterAttrTypeUUID),
-    encounter: obsObject.resultsEncounterUuid,
-    value: yesConceptUUID,
-    voided: false,
-  };
+// export async function postApproval(
+//   obsObject: Obs,
+//   pathologyResultsApprovedconceptUUID: string,
+//   healthCenterAttrTypeUUID: string,
+//   yesConceptUUID: string
+// ) {
+//   const ObsObjectTocreate = {
+//     person: obsObject.patientUuid,
+//     obsDatetime: new Date().toISOString(),
+//     concept: pathologyResultsApprovedconceptUUID,
+//     location: await getUserLocation(healthCenterAttrTypeUUID),
+//     encounter: obsObject.resultsEncounterUuid,
+//     value: yesConceptUUID,
+//     voided: false,
+//   };
 
-  const response = await openmrsFetch("/ws/rest/v1/obs?v=full", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: ObsObjectTocreate,
-  });
-  return response;
-}
-export async function voidApprovalObs(approvalObsUuid: string) {
-  const ObsObjectTocreate = {
-    voided: true,
-  };
+//   const response = await openmrsFetch("/ws/rest/v1/obs?v=full", {
+//     method: "POST",
+//     headers: {
+//       "content-type": "application/json",
+//     },
+//     body: ObsObjectTocreate,
+//   });
+//   return response;
+// }
+// export async function voidApprovalObs(approvalObsUuid: string) {
+//   const ObsObjectTocreate = {
+//     voided: true,
+//   };
 
-  const response = await openmrsFetch(
-    `/ws/rest/v1/obs/${approvalObsUuid}`,
-    {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: ObsObjectTocreate,
-    }
-  );
-  console.log("voidedddddddddddddd");
+//   const response = await openmrsFetch(
+//     `/ws/rest/v1/obs/${approvalObsUuid}`,
+//     {
+//       method: "POST",
+//       headers: {
+//         "content-type": "application/json",
+//       },
+//       body: ObsObjectTocreate,
+//     }
+//   );
+//   console.log("voidedddddddddddddd");
 
-  return response;
-}
+//   return response;
+// }
 
 export async function getUser(userUuid: string) {
   const user = await openmrsFetch(`/ws/rest/v1/user/${userUuid}`);

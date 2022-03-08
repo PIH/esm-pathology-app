@@ -1,6 +1,16 @@
 import React from "react";
-import { Document, Page, Text,Image, View, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, Text,Image, View, StyleSheet,Font } from "@react-pdf/renderer";
 import ButaroLogo from '../images/ButaroHospitalLogo.gif';
+import GeorgiaFontBold from '../Fonts/georgia/georgia-bold.ttf';
+import GeorgiaFont from '../Fonts/georgia/Georgia.ttf';
+
+// import { Font } from '@react-pdf/renderer';
+Font.register({ family: 'GeorgiaBold', src: GeorgiaFontBold});
+Font.register({ family: 'Georgia', src: GeorgiaFont});
+
+// Font.register({ family: 'Georgia', src: '../Fonts/georgia/Georgia.ttf', fontStyle: 'normal', fontWeight: 'normal' });
+
+
 
 
 // Create styles
@@ -16,14 +26,17 @@ const styles = StyleSheet.create({
   },
   textLabels: {
     padding: 7,
+    fontFamily:"GeorgiaBold",
     fontSize: 16,
-    fontWeight: 'heavy',
+    fontWeight: 'bold',
     paddingBottom:30,
   },
   textAnswers: {
     margin: 10,
     padding: 20,
+    fontFamily:"Georgia",
     fontSize: 14,
+    // fontFamily:"Times New Roman",
   },
   image: {
     width: 61,
@@ -43,7 +56,7 @@ const MyDocument = (props) => (
       <View style={styles.section}>
         <Image style={styles.image} src={ButaroLogo}/>
         <Text style={{fontSize: 8}}>Butaro Cancer Center</Text>
-        <Text style={{ borderBottom:'1px', textAlign: 'center',fontWeight: 1500, margin: 30 }}> 
+        <Text style={{ borderBottom:'1px', textAlign: 'center',fontWeight: 1500, margin: 30,fontFamily:"GeorgiaBold" }}> 
           Pathology Report 
         </Text>
         <Text style={{ paddingBottom: 10 }} > 
@@ -122,7 +135,7 @@ const MyDocument = (props) => (
           {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.uuid==props.config.OtherBiopsyLocationconceptUUID && obser.value)}
           </Text>
         </Text>
-        <Text style={{paddingBottom: 10}}>Anatomical location:</Text>
+        <Text style={{paddingBottom: 10 ,fontFamily:"Georgia"}}>Anatomical location:</Text>
         <Text style={{ paddingBottom: 10,paddingLeft:10 }}> 
           <Text style={styles.textLabels}>
             i.System:
