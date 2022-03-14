@@ -68,12 +68,17 @@ const MyDocument = (props) => (
        <View style={styles.section}>
         <Image style={styles.logo} src={ButaroLogo}/>
         <Text style={{fontSize: 8}}>Butaro Hospital</Text>
-        <Text style={[styles.textAnswers,{ position: "absolute",top: 0,left: 300,width: 300 }]}>Lab phone number: 0784433618</Text>
-        <Text style={[styles.textAnswers,{ position: "absolute",top: 15,left: 300,width: 300 }]}>
+        <Text style={{ position: "absolute",top: 0,left: 300,width: 300 }}>
           <Text style={styles.textAnswers}>
-            Accession Number:
+          Lab phone number:
+          </Text>
+          <Text>{" "}{" "}0784433618</Text>
+        </Text>
+        <Text style={{ position: "absolute",top: 15,left: 300,width: 300 }}>
+          <Text style={styles.textAnswers}>
+            Accession number:
           </Text> 
-          <Text style={styles.textAnswers}>
+          <Text >
           {" "}{" "}
           {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.uuid==props.config.AccessionNumberconceptUUID && obser.value)}
           </Text>
