@@ -84,6 +84,10 @@ const ReportComponent = () => {
       header: "Sample drop off?",
     },
     {
+      key: "pathologicDiagnosisObs",
+      header: "Pathologic diagnosis",
+    },
+    {
       key: "resultsEncounter",
       header: "Results",
     },
@@ -141,12 +145,6 @@ const ReportComponent = () => {
         );
       }
     });
-  //replace(/\s+/g, '');
-  // const rows = filteredEncList.map(
-  //   (encounterInfo) => {
-  //       return {
-  //           // patientLink: <a href={`/openmrs/patientDashboard.form?patientId=${encounterInfo.personId}`} >Link</a>,
-  //           ...
 
   const rows = filteredEncList.map((encounterInfo) => {
     return {
@@ -241,6 +239,7 @@ const ReportComponent = () => {
           onChange={(e) => sampleDropOffChange(encounterInfo)}
         />
       ),
+      pathologicDiagnosisObs: encounterInfo.pathologicDiagnosisObs,
       resultsEncounter: encounterInfo.resultsEncounterId ? (
         <a
           data-testid="resultsEncounter"
@@ -308,43 +307,6 @@ const ReportComponent = () => {
     }
   };
 
-  // const approveChange = (encounterInfo) => {
-  //   // Add pathologist approve obs to results.
-  //   const tempEncList = cloneDeep(encountersList);
-  //   if (!encounterInfo.approvedBy) {
-  //     postApproval(
-  //       encounterInfo,
-  //       config.pathologyResultsApprovedconceptUUID,
-  //       config.healthCenterAttrTypeUUID,
-  //       config.yesConceptUUID
-  //     ).then((obsResponse) => {
-  //       if (obsResponse.ok) {
-  //         const encIndex = tempEncList.findIndex(
-  //           (enc) => enc.encounterUuid == encounterInfo.encounterUuid
-  //         );
-  //         getUser(obsResponse.data.auditInfo.creator.uuid).then((response) => {
-  //           console.log("approval response = " + JSON.stringify( obsResponse));
-  //           tempEncList[encIndex].approvedBy = response.person.display + " On: " + 
-  //             new Date().toLocaleString(["en-GB","en-US","en","fr-RW"],{day: 'numeric',month: 'numeric',year: 'numeric'});
-  //           tempEncList[encIndex].approvalObsUuid = obsResponse.data.uuid;
-  //           setEncountersList(tempEncList);
-  //         });
-  //       }
-  //     });
-  //   }
-  //   else if(encounterInfo.approvalObsUuid){
-  //     voidApprovalObs(encounterInfo.approvalObsUuid).then((obsVoidingResponse)=>{
-  //       if(obsVoidingResponse.ok) {
-  //         const encIndex = tempEncList.findIndex(
-  //           (enc) => enc.encounterUuid == encounterInfo.encounterUuid
-  //         );
-  //         tempEncList[encIndex].approvedBy = "";
-  //         tempEncList[encIndex].approvalObsUuid ="";
-  //         setEncountersList(tempEncList);
-  //       }
-  //     });
-  //   }
-  // };
 
   const sampleStatusChange = (
     newStatus: { uuid: string; display: string },

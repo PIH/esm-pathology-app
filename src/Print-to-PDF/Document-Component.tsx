@@ -17,7 +17,6 @@ Font.register({ family: 'Georgia', src: GeorgiaFont});
 const styles = StyleSheet.create({
   page: {
     flexDirection: "row",
-    backgroundColor: "#E4E4E4",
   },
   section: {
     margin: 10,
@@ -31,15 +30,28 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     paddingBottom:30,
   },
+  sentenceLabels: {
+    paddingTop: 7,
+    fontFamily:"GeorgiaBold",
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingBottom:3,
+  },
   textAnswers: {
     margin: 10,
     padding: 20,
     fontFamily:"Georgia",
     fontSize: 14,
-    // fontFamily:"Times New Roman",
   },
-  image: {
+  sentenceAnswers: {
+    marginBottom: 10,
+    paddingBottom: 20,
+    fontFamily:"Georgia",
+    fontSize: 14,
+  },
+  logo: {
     width: 61,
+
   }
 });
 
@@ -52,16 +64,26 @@ const MyDocument = (props) => (
   ${props.encounterInfo.middle_name} `}
   >
     <Page size="A4" style={styles.page}>
-      
-      <View style={styles.section}>
-        <Image style={styles.image} src={ButaroLogo}/>
-        <Text style={{fontSize: 8}}>Butaro Cancer Center</Text>
-        <Text style={{ borderBottom:'1px', textAlign: 'center',fontWeight: 1500, margin: 30,fontFamily:"GeorgiaBold" }}> 
+     
+       <View style={styles.section}>
+        <Image style={styles.logo} src={ButaroLogo}/>
+        <Text style={{fontSize: 8}}>Butaro Hospital</Text>
+        <Text style={[styles.textAnswers,{ position: "absolute",top: 0,left: 300,width: 300 }]}>Lab phone number: 0784433618</Text>
+        <Text style={[styles.textAnswers,{ position: "absolute",top: 15,left: 300,width: 300 }]}>
+          <Text style={styles.textAnswers}>
+            Accession Number:
+          </Text> 
+          <Text style={styles.textAnswers}>
+          {" "}{" "}
+          {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.uuid==props.config.AccessionNumberconceptUUID && obser.value)}
+          </Text>
+        </Text>
+        <Text style={{ backgroundColor: "#E4E4E4",borderBottom:'1px', textAlign: 'center',fontWeight: 1500, marginBottom: 30,fontFamily:"GeorgiaBold" }}> 
           Pathology Report 
         </Text>
         <Text style={{ paddingBottom: 10 }} > 
-          <Text style={styles.textLabels}>
-            Patient:
+          <Text style={styles.textAnswers}>
+            Patient Name:
           </Text> 
           <Text style={styles.textAnswers}>
           {" "}{" "}
@@ -71,30 +93,9 @@ const MyDocument = (props) => (
           </Text>
           
         </Text>
-        <Text style={{ paddingBottom: 10 }}>  
-          <Text style={styles.textLabels}>
-            Date:
-          </Text> 
+        <Text style={{ paddingBottom: 10, position: "absolute",top: 140,left: 335  }}>
           <Text style={styles.textAnswers}>
-          {" "}{" "}
-            {
-              new Date(props.encounterInfo.resultsEncounter.encounterDatetime)
-              .toLocaleString(["en-GB","en-US","en","fr-RW"],{day: 'numeric',month: 'numeric',year: 'numeric'})
-            } 
-          </Text>
-        </Text>
-        <Text style={{ paddingBottom: 10 }}>
-          <Text style={styles.textLabels}>
-            Accession Number:
-          </Text> 
-          <Text style={styles.textAnswers}>
-          {" "}{" "}
-          {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.uuid==props.config.AccessionNumberconceptUUID && obser.value)}
-          </Text>
-        </Text>
-        <Text style={{ paddingBottom: 10 }}>
-          <Text style={styles.textLabels}>
-            Specimen Date:
+            Surgery Date:
           </Text> 
           <Text style={styles.textAnswers}>
           {" "}{" "}
@@ -105,9 +106,22 @@ const MyDocument = (props) => (
           </Text>
         
         </Text>
-        <Text style={{ paddingBottom: 10 }}> 
-          <Text style={styles.textLabels}>
-            Specimen Submission Date:
+        <Text style={{ paddingBottom: 10 }} > 
+          <Text style={styles.textAnswers}>
+            Patient Birthday:
+          </Text> 
+          <Text style={styles.textAnswers}>
+          {" "}{" "}
+          {
+          new Date(props.encounterInfo.personBirthdate)
+              .toLocaleString(["en-GB","en-US","en","fr-RW"],{day: 'numeric',month: 'numeric',year: 'numeric'})
+            }
+          </Text>
+          
+        </Text>
+        <Text style={{ paddingBottom: 10, position: "absolute",top: 168,left: 335,width: 200  }}> 
+          <Text style={styles.textAnswers}>
+            Specimen Reception Date:
           </Text> 
           <Text style={styles.textAnswers}>
           {" "}{" "}
@@ -117,7 +131,30 @@ const MyDocument = (props) => (
           )}
           </Text>
         </Text>
-        <Text style={{ paddingBottom: 10 }}> 
+        <Text style={{ paddingBottom: 10,borderBottom:'1px' }} > 
+          <Text style={styles.textAnswers}>
+            Patient Gender:
+          </Text> 
+          <Text style={styles.textAnswers}>
+          {" "}{" "}
+            {props.encounterInfo.personGender}
+          </Text>
+          
+        </Text>
+        <Text style={{ paddingBottom: 10, position: "absolute",top: 200,left: 335,width: 250 }}>  
+          <Text style={styles.textAnswers}>
+            Signout Date:
+          </Text> 
+          <Text style={styles.textAnswers}>
+          {" "}{" "}
+            {
+              new Date(props.encounterInfo.resultsEncounter.encounterDatetime)
+              .toLocaleString(["en-GB","en-US","en","fr-RW"],{day: 'numeric',month: 'numeric',year: 'numeric'})
+            } 
+          </Text>
+        </Text>
+        
+        <Text style={{ backgroundColor: "#E4E4E4",paddingBottom: 10 }}> 
           <Text style={styles.textLabels}>
             Sending Physician:
           </Text> 
@@ -126,7 +163,7 @@ const MyDocument = (props) => (
           {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.uuid==props.config.SendingPhysicianconceptUUID && obser.value)}
           </Text>
         </Text>
-        <Text style={{ paddingBottom: 10 }}>
+        <Text style={{ backgroundColor: "#E4E4E4",paddingBottom: 10 }}>
           <Text style={styles.textLabels}>
             Sending Facility: 
           </Text> 
@@ -135,8 +172,8 @@ const MyDocument = (props) => (
           {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.uuid==props.config.OtherBiopsyLocationconceptUUID && obser.value)}
           </Text>
         </Text>
-        <Text style={{paddingBottom: 10 ,fontFamily:"Georgia"}}>Anatomical location:</Text>
-        <Text style={{ paddingBottom: 10,paddingLeft:10 }}> 
+        <Text style={{backgroundColor: "#E4E4E4",paddingBottom: 10 ,fontFamily:"Georgia"}}>Anatomical location:</Text>
+        <Text style={{backgroundColor: "#E4E4E4", paddingBottom: 10,paddingLeft:10 }}> 
           <Text style={styles.textLabels}>
             i.System:
           </Text> 
@@ -145,7 +182,7 @@ const MyDocument = (props) => (
           {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.uuid==props.config.OrganSystemconceptUUID && (obser.value.name.display+ ",  "))}
           </Text>
         </Text>
-        <Text style={{ paddingBottom: 10,paddingLeft:10 }}>
+        <Text style={{backgroundColor: "#E4E4E4", paddingBottom: 10,paddingLeft:10 }}>
           <Text style={styles.textLabels}>
             ii.Organ:
           </Text> 
@@ -154,7 +191,7 @@ const MyDocument = (props) => (
           {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.uuid==props.config.OrganconceptUUID && (obser.value.name.display+ ",  "))} 
           </Text>
         </Text>
-        <Text style={{ paddingBottom: 10,paddingLeft:10 }}>
+        <Text style={{backgroundColor: "#E4E4E4", paddingBottom: 10,paddingLeft:10 }}>
           <Text style={styles.textLabels}>
             iii.Detail:
           </Text> 
@@ -163,7 +200,7 @@ const MyDocument = (props) => (
           {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.uuid==props.config.SpecimenDetailconceptUUID && obser.value)}
           </Text>
         </Text>
-        <Text style={{ paddingBottom: 10 }}>
+        <Text style={{backgroundColor: "#E4E4E4", paddingBottom: 10 }}>
           <Text style={styles.textLabels}>
             Procedure type:
           </Text> 
@@ -172,44 +209,31 @@ const MyDocument = (props) => (
           {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.uuid==props.config.OtherTestsOrProceduresconceptUUID && obser.value)}
           </Text>
         </Text>
-        <Text style={{ paddingBottom: 10 }}>
-          <Text style={styles.textLabels}>
-            Gross Description:
+          <Text style={[styles.sentenceLabels]}>
+            Gross Description: 
           </Text> 
-          <Text style={styles.textAnswers}>
-          {" "}{" "}
+          <Text style={[styles.sentenceAnswers]}>
             {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.uuid==props.config.GrossDescriptionconceptUUID && obser.value)}
-
+           
           </Text>
-        </Text>
-        <Text style={{ paddingBottom: 10 }}> 
-          <Text style={styles.textLabels}>
+          <Text style={styles.sentenceLabels}>
             Microscopic Examination:
           </Text> 
-          <Text style={styles.textAnswers}>
-          {" "}{" "}
+          <Text style={styles.sentenceAnswers}>
+          
             {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.uuid==props.config.MacroscopicExaminationconceptUUID && obser.value)}
+
           </Text>
-        </Text>
-        <Text style={{ paddingBottom: 10 }}>
-          <Text style={styles.textLabels}>
+          <Text style={styles.sentenceLabels}>
             Conclusion:
           </Text> 
-          <Text style={styles.textAnswers}>
-          {" "}{" "}
+          <Text style={styles.sentenceAnswers}>
+          
             {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.uuid==props.config.COMMENTSATCONCLUSIONOFEXAMINATIONconceptUUID && obser.value)}
+          
           </Text>
-        </Text>
-        <Text style={{ paddingBottom: 10 }}>
-          <Text style={styles.textLabels}>
-            Canreg Code:
-          </Text> 
-          <Text style={styles.textAnswers}>
-          {" "}{" "}
-            {props.encounterInfo.resultsEncounter.obs.map((obser) => obser.concept.display=="Canreg Code" && obser.value)}
-          </Text>
-        </Text>
-        <Text style={{ paddingBottom: 10 }}>  
+
+         <Text style={{backgroundColor: "#E4E4E4", paddingBottom: 10 }}>  
           <Text style={styles.textLabels}>
             Validated by pathologist:
           </Text> 
@@ -218,7 +242,7 @@ const MyDocument = (props) => (
             {props.encounterInfo.approvedBy}
           </Text>
         </Text>
-      </View>
+      </View>  
     </Page>
   </Document>
 );
