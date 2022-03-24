@@ -55,7 +55,7 @@ export async function getUserLocation(healthCenterAttrTypeUUID) {
   const hcPersonAttribute = person.data.results.filter(
     (attr) => attr.attributeType.uuid === healthCenterAttrTypeUUID
   );
-  return hcPersonAttribute[0] && hcPersonAttribute.value.uuid;
+  return hcPersonAttribute[0] && hcPersonAttribute[0].value.uuid;
 }
 
 export async function getConceptAnswers(conceptUuid) {
