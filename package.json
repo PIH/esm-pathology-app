@@ -1,6 +1,6 @@
 {
   "name": "@pih/esm-pathology-app",
-  "version": "1.0.5.",
+  "version": "1.0.5",
   "license": "MPL-2.0",
   "description": "A microfrontend pathology OpenMRS",
   "browser": "dist/pih-esm-pathology-app.js",
