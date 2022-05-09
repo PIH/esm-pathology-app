@@ -1,13 +1,13 @@
 {
   "name": "@pih/esm-pathology-app",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "license": "MPL-2.0",
   "description": "A microfrontend pathology OpenMRS",
   "browser": "dist/pih-esm-pathology-app.js",
   "main": "src/index.ts",
   "source": true,
   "scripts": {
-    "start": "openmrs develop --backend http://10.160.20.28:8080",
+    "start": "openmrs develop --backend http://imb.pih-emr.org:8096",
     "serve": "webpack serve --mode development",
     "build": "webpack --mode production",
     "analyze": "webpack --mode=production --env.analyze=true",

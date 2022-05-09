@@ -24,8 +24,6 @@ import {
   postReferralStatusChangeObs,
   updateReferralStatusChangeObs,
   EncounterResult,
-  // postApproval,
-  // voidApprovalObs,
   getUser,
   Concept,
   getEncounter,
@@ -109,9 +107,7 @@ const ReportComponent = () => {
     getEncounters(
       config.healthCenterAttrTypeUUID,
       config.pathologyFullAllowedLocationUUID
-    ).then(
-      setEncountersList
-      );
+    ).then(setEncountersList);
   }, []);
 
   const filteredEncList = encountersList
@@ -148,8 +144,6 @@ const ReportComponent = () => {
 
   const rows = filteredEncList.map((encounterInfo) => {
     return {
-      // rows.push({
-      // patientLink: <a href={`/openmrs/patientDashboard.form?patientId=${encounterInfo.personId}`} >Link</a>,
       id: encounterInfo.encounterId,
       patientNames: (
         <a
@@ -202,8 +196,10 @@ const ReportComponent = () => {
           ))}
         </select>
       ),
-      dateOfRequest: new Date(encounterInfo.encounterDatetime)
-                .toLocaleString(["en-GB","en-US","en","fr-RW"],{day: 'numeric',month: 'numeric',year: 'numeric'}),
+      dateOfRequest: new Date(encounterInfo.encounterDatetime).toLocaleString(
+        ["en-GB", "en-US", "en", "fr-RW"],
+        { day: "numeric", month: "numeric", year: "numeric" }
+      ),
       referralStatus: (
         <select
           onChange={(e) =>
@@ -259,18 +255,19 @@ const ReportComponent = () => {
           </a>
         )
       ),
-      PDFReport:
-        encounterInfo.resultsEncounterId &&
-        (
-          encounterInfo.approvedBy &&
-            <PDFDownloadLink document={<MyDocument encounterInfo={encounterInfo} config={config} />} fileName="Pathology Report">
-              {({loading}) => (loading ? 'loading...' : <button>Download</button>)}
-            </PDFDownloadLink>
-            
-              
-           
-        )
-        
+      PDFReport: encounterInfo.resultsEncounterId &&
+        encounterInfo.approvedBy && (
+          <PDFDownloadLink
+            document={
+              <MyDocument encounterInfo={encounterInfo} config={config} />
+            }
+            fileName="Pathology Report"
+          >
+            {({ loading }) =>
+              loading ? "loading..." : <button>Download</button>
+            }
+          </PDFDownloadLink>
+        ),
     };
   });
 
@@ -300,13 +297,11 @@ const ReportComponent = () => {
           );
           tempEncList[encIndex].sampleDropoffObs = "";
           tempEncList[encIndex].sampleDropoffObsUuid = "";
-
           setEncountersList(tempEncList);
         }
       });
     }
   };
-
 
   const sampleStatusChange = (
     newStatus: { uuid: string; display: string },
@@ -397,7 +392,6 @@ const ReportComponent = () => {
       });
     }
   };
-  
 
   return (
     <div>
@@ -462,7 +456,7 @@ const ReportComponent = () => {
           onChange={(e) => setPatientName(e.target.value)}
         />
       </div>
-      {console.log( encountersList)}
+      {console.log(encountersList)}
       <div className={styles.tableContainer}>
         <DataTable rows={rows} headers={headers}>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
@@ -489,15 +483,7 @@ const ReportComponent = () => {
           )}
         </DataTable>
       </div>
-      <div>
-        {/* <PDFViewer>
-          <MyDocument />
-        </PDFViewer> */}
-        {/* <PDFDownloadLink document={<MyDocument />} fileName="Pathology Report">
-          {({loading}) => (loading ? 'loading...' : <button>Download</button>)}
-        </PDFDownloadLink> */}
-        
-      </div>
+      <div></div>
     </div>
   );
 };
