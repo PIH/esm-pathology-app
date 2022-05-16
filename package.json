@@ -16,7 +16,8 @@
     "typescript": "tsc",
     "test": "jest --config jest.config.json",
     "coverage": "npm run test -- --coverage",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "verify": "concurrently 'npm:lint' 'npm:test' 'npm:typescript'"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"

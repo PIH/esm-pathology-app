@@ -4,4 +4,4 @@
 set -e
 
 npx pretty-quick --staged
-npx concurrently 'npm:lint' 'npm:test' 'npm:typescript'
+npm run verify
