@@ -16,8 +16,7 @@
       "es2018",
       "es2020"
     ],
-    "noEmit": true,
-    "target": "esnext"
+    "noEmit": true
   },
   "include": ["src/**/*"],
   "exclude": ["src/**/*.test.tsx", "src/**/*.outdated.tsx"]
