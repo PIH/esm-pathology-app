@@ -1,4 +1,3 @@
-# pih-esm-pathology-app
+# MOVED
 
-Project notes: http://imbcitrus.pih-emr.org:9000/display/HISCol/Oncology+CIRGO+Pathology+EMR+Planing
-
+To https://github.com/PIH/pih-esm-butaro-oncology
